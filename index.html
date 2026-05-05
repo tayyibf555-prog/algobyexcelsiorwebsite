@@ -2208,6 +2208,14 @@
     // (the discovery call) so pricing is discussed live.
     const CHECKOUT_SUBSCRIPTION_URL = '';
 
+    // OPTIONAL — admin portal lead intake URL. When set, the
+    // checkout form POSTs the buyer's name/email/phone/etc here
+    // before redirecting to Stripe, so the admin portal can show
+    // who filled the form vs who actually completed payment.
+    // For local development: 'http://localhost:4002/api/leads'
+    // For production: 'https://admin.algobyexcelsior.co.uk/api/leads'
+    const LEADS_API_URL = '';
+
     // ==========================================================
     // INIT
     // ==========================================================
@@ -2272,14 +2280,50 @@
           const fd = new FormData(subForm);
           const data = Object.fromEntries(fd.entries());
 
-          // Persist locally so a backend webhook (Formspree /
-          // Netlify Forms / etc.) can be wired later without
-          // touching the form UI.
+          // Generate a stable client_reference_id NOW so the same
+          // value goes to both the admin API and the Stripe URL,
+          // letting the Stripe webhook tie the payment back to
+          // this exact form submission.
+          const clientRefId = 'algo_' + Date.now().toString(36) + '_' +
+            Math.random().toString(36).slice(2, 8);
+
+          // Persist locally so a backend webhook can recover it
+          // later if needed.
           try {
             sessionStorage.setItem('algo_checkout_intent', JSON.stringify({
-              ...data, ts: Date.now()
+              ...data, client_reference_id: clientRefId, ts: Date.now()
             }));
           } catch (_) {}
+
+          // Optional — fire-and-forget POST to the admin portal
+          // so the operator can see who filled the form even if
+          // they never complete checkout.
+          if (LEADS_API_URL) {
+            try {
+              const params = new URLSearchParams(window.location.search);
+              const payload = {
+                ...data,
+                risk_ack: !!data.risk_ack,
+                client_reference_id: clientRefId,
+                source: 'marketing-site',
+                referrer: document.referrer || '',
+                utm_source: params.get('utm_source') || '',
+                utm_medium: params.get('utm_medium') || '',
+                utm_campaign: params.get('utm_campaign') || ''
+              };
+              const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
+              if (navigator.sendBeacon && navigator.sendBeacon(LEADS_API_URL, blob)) {
+                // beacon queued — fastest, doesn't block redirect
+              } else {
+                fetch(LEADS_API_URL, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(payload),
+                  keepalive: true
+                }).catch(() => {});
+              }
+            } catch (_) {}
+          }
 
           if (!CHECKOUT_SUBSCRIPTION_URL) {
             if (subErr) {
@@ -2289,16 +2333,13 @@
           }
 
           // Build Stripe URL with prefilled email +
-          // client_reference_id for the webhook to match against.
+          // client_reference_id for the webhook to match against
+          // the same value already POSTed to the admin API.
           let target = CHECKOUT_SUBSCRIPTION_URL;
           try {
             const url = new URL(CHECKOUT_SUBSCRIPTION_URL);
             if (data.email) url.searchParams.set('prefilled_email', String(data.email));
-            url.searchParams.set(
-              'client_reference_id',
-              'algo_' + Date.now().toString(36) + '_' +
-              Math.random().toString(36).slice(2, 8)
-            );
+            url.searchParams.set('client_reference_id', clientRefId);
             target = url.toString();
           } catch (_) { /* invalid URL — fall through to raw value */ }
 
