@@ -156,11 +156,16 @@
       position: relative;
       font-family: var(--font-display);
       font-weight: 800;
-      font-size: clamp(6.5rem, 22vw, 16rem);
+      font-size: clamp(3.75rem, 22vw, 16rem);
       letter-spacing: -0.06em;
       line-height: 0.85;
       color: var(--gold);
       font-variant-numeric: tabular-nums;
+      max-width: 100%;
+      overflow-wrap: anywhere;
+    }
+    @media (max-width: 380px) {
+      .big-number .num { font-size: clamp(3.25rem, 18vw, 5rem); }
     }
     .big-number .num::after {
       content: '';
@@ -454,6 +459,13 @@
       from { transform: translateX(0); }
       to   { transform: translateX(-50%); }
     }
+    @media (max-width: 600px) {
+      .tickertape {
+        mask-image: linear-gradient(90deg, transparent 0%, #000 3%, #000 97%, transparent 100%);
+        -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 3%, #000 97%, transparent 100%);
+      }
+      .tt-track { animation-duration: 140s; gap: 2rem; padding-left: 2rem; }
+    }
 
     /* ============================================================
        HERO — chart-led, two-column. No video. No outlined text.
@@ -665,6 +677,9 @@
       padding-top: 1rem;
       border-top: 1px solid var(--hairline);
     }
+    @media (max-width: 480px) {
+      .hero-chart .row { grid-template-columns: repeat(2, 1fr); gap: 0.85rem 1rem; }
+    }
     .hero-chart .row .stat .lab {
       font-family: var(--font-mono);
       font-size: 0.625rem;
@@ -807,12 +822,34 @@
       letter-spacing: -0.01em;
     }
 
-    .trades {
+    .trades-wrap {
       margin-top: 2.5rem;
-      background: transparent;
+      position: relative;
       border: 1px solid var(--hairline);
       border-radius: var(--radius);
       overflow: hidden;
+    }
+    .trades-wrap::after {
+      content: '';
+      position: absolute;
+      top: 0; right: 0; bottom: 0;
+      width: 32px;
+      pointer-events: none;
+      background: linear-gradient(90deg, transparent, rgba(7, 5, 3, 0.85));
+      opacity: 0;
+      transition: opacity 200ms ease-out;
+    }
+    .trades-wrap.has-overflow::after { opacity: 1; }
+    .trades {
+      background: transparent;
+      width: 100%;
+    }
+    @media (max-width: 720px) {
+      .trades-wrap {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      .trades { min-width: 560px; }
     }
     .trades thead th {
       font-family: var(--font-mono);
@@ -1053,12 +1090,12 @@
     @media (max-width: 900px) {
       .how-sticky { height: auto; }
       .how-pin { position: static; height: auto; min-height: 0; display: block; }
-      .how-frame { padding-block: clamp(4rem, 10vw, 6rem); gap: 2rem; height: auto; }
+      .how-frame { padding-block: clamp(4rem, 10vw, 6rem); gap: 1.75rem; height: auto; }
       .how-stage {
         position: static;
         display: flex;
         flex-direction: column;
-        gap: clamp(3rem, 8vw, 5rem);
+        gap: clamp(2.5rem, 7vw, 4rem);
       }
       .how-pane {
         position: static;
@@ -1066,11 +1103,21 @@
         transform: none;
         pointer-events: auto;
         grid-template-columns: 1fr;
-        gap: 2rem;
+        gap: 1.5rem;
       }
-      .how-pane .big-marker { font-size: clamp(4rem, 16vw, 6rem); margin-bottom: 1rem; }
+      .how-pane .big-marker {
+        font-size: clamp(3.5rem, 14vw, 5.5rem);
+        margin-bottom: 0.75rem;
+      }
+      .how-pane h2 { font-size: clamp(1.5rem, 5.5vw, 2.25rem); }
+      .how-pane p { font-size: 1rem; }
+      .how-pane .screen { max-width: 100%; }
       .how-progress-bar { display: none; }
       .how-progress .counter { display: none; }
+    }
+    @media (max-width: 480px) {
+      .how-pane .screen-body { padding: 1rem 1.1rem; font-size: 0.75rem; }
+      .how-pane .meta { font-size: 0.625rem; padding: 0.4rem 0.75rem; }
     }
 
     /* ============================================================
@@ -1761,6 +1808,7 @@
           </div>
         </div>
 
+        <div class="trades-wrap" id="tradesWrap">
         <table class="trades" aria-label="Recent trades">
           <thead>
             <tr>
@@ -1779,6 +1827,7 @@
             <tr><td class="muted">2026-04-25</td><td>NQ</td><td>18,420.00</td><td>18,365.50</td><td class="r neg">−0.30%</td></tr>
           </tbody>
         </table>
+        </div>
 
         <p class="results-disclaimer">Past performance does not guarantee future results. All trading carries risk of capital loss. Results shown are from a live verified account.</p>
       </div>
@@ -2313,6 +2362,22 @@
     if (resultsChartEl) io.observe(resultsChartEl);
     const finalCta = document.getElementById('cta');
     if (finalCta) io.observe(finalCta);
+
+    // ==========================================================
+    // TRADES TABLE — show right-edge fade only when overflowing
+    // ==========================================================
+    (function tradesOverflow() {
+      const wrap = document.getElementById('tradesWrap');
+      if (!wrap) return;
+      function check() {
+        const overflow = wrap.scrollWidth > wrap.clientWidth + 2 &&
+                         wrap.scrollLeft + wrap.clientWidth < wrap.scrollWidth - 2;
+        wrap.classList.toggle('has-overflow', overflow);
+      }
+      check();
+      wrap.addEventListener('scroll', check, { passive: true });
+      window.addEventListener('resize', check, { passive: true });
+    })();
 
     // ==========================================================
     // SECTION ENTRANCES — gentle opacity ease as each section
