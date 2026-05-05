@@ -2228,86 +2228,84 @@
       // Subscription checkout flow:
       //   1. Click Get Started → reveal the form inside the card
       //   2. Fill name / email / phone / risk-acknowledge
-      //   3. Click Next → redirect to Stripe with prefilled_email
-      //      and a client_reference_id appended.
-      // The form is disabled (button ghosted) until a real
-      // CHECKOUT_SUBSCRIPTION_URL is set.
+      //   3. Click Next → if CHECKOUT_SUBSCRIPTION_URL is set,
+      //      redirect to Stripe with prefilled_email +
+      //      client_reference_id appended; otherwise show an
+      //      inline "checkout pending" message.
       const subBtn  = document.getElementById('checkoutSubscription');
       const subForm = document.getElementById('subscriptionForm');
       const subCard = subBtn ? subBtn.closest('.price-card') : null;
       const subErr  = document.getElementById('cf-error');
 
       if (subBtn && subCard && subForm) {
-        if (CHECKOUT_SUBSCRIPTION_URL) {
-          subBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            subCard.classList.add('show-form');
-            const first = subForm.querySelector('input');
-            if (first) setTimeout(() => first.focus(), 80);
-          });
+        // Always allow opening the form — Next handles the URL state.
+        subBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          subCard.classList.add('show-form');
+          const first = subForm.querySelector('input');
+          if (first) setTimeout(() => first.focus(), 80);
+        });
 
-          const backBtn = subForm.querySelector('.form-back');
-          if (backBtn) backBtn.addEventListener('click', () => {
-            subCard.classList.remove('show-form');
-            if (subErr) subErr.textContent = '';
-          });
+        const backBtn = subForm.querySelector('.form-back');
+        if (backBtn) backBtn.addEventListener('click', () => {
+          subCard.classList.remove('show-form');
+          if (subErr) subErr.textContent = '';
+        });
 
-          subForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            if (subErr) subErr.textContent = '';
+        subForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          if (subErr) subErr.textContent = '';
 
-            // HTML5 validity covers required + email format
-            if (!subForm.checkValidity()) {
-              const firstInvalid = subForm.querySelector(':invalid');
-              if (firstInvalid) {
-                firstInvalid.focus();
-                if (subErr) {
-                  subErr.textContent = firstInvalid.validationMessage ||
-                    'Please complete all required fields.';
-                }
+          // HTML5 validity covers required + email format
+          if (!subForm.checkValidity()) {
+            const firstInvalid = subForm.querySelector(':invalid');
+            if (firstInvalid) {
+              firstInvalid.focus();
+              if (subErr) {
+                subErr.textContent = firstInvalid.validationMessage ||
+                  'Please complete all required fields.';
               }
-              return;
             }
+            return;
+          }
 
-            const fd = new FormData(subForm);
-            const data = Object.fromEntries(fd.entries());
+          const fd = new FormData(subForm);
+          const data = Object.fromEntries(fd.entries());
 
-            // Persist locally so a backend webhook (Formspree /
-            // Netlify Forms / etc.) can be wired later without
-            // touching the form UI.
-            try {
-              sessionStorage.setItem('algo_checkout_intent', JSON.stringify({
-                ...data, ts: Date.now()
-              }));
-            } catch (_) {}
+          // Persist locally so a backend webhook (Formspree /
+          // Netlify Forms / etc.) can be wired later without
+          // touching the form UI.
+          try {
+            sessionStorage.setItem('algo_checkout_intent', JSON.stringify({
+              ...data, ts: Date.now()
+            }));
+          } catch (_) {}
 
-            // Build Stripe URL with prefilled email +
-            // client_reference_id for the webhook to match against.
-            let target = CHECKOUT_SUBSCRIPTION_URL;
-            try {
-              const url = new URL(CHECKOUT_SUBSCRIPTION_URL);
-              if (data.email) url.searchParams.set('prefilled_email', String(data.email));
-              url.searchParams.set(
-                'client_reference_id',
-                'algo_' + Date.now().toString(36) + '_' +
-                Math.random().toString(36).slice(2, 8)
-              );
-              target = url.toString();
-            } catch (_) { /* invalid URL — fall through to raw value */ }
+          if (!CHECKOUT_SUBSCRIPTION_URL) {
+            if (subErr) {
+              subErr.textContent = 'Checkout is currently pending. Your details have been saved — please book a discovery call instead.';
+            }
+            return;
+          }
 
-            // Redirect in same tab so Stripe controls the flow
-            // from here. The buyer can use back-button to return.
-            window.location.href = target;
-          });
-        } else {
-          // No URL configured — keep the button disabled and
-          // unclickable, same as before.
-          subBtn.href = '#';
-          subBtn.addEventListener('click', e => e.preventDefault());
-          subBtn.style.opacity = '0.55';
-          subBtn.style.cursor = 'not-allowed';
-          subBtn.title = 'Checkout not yet configured';
-        }
+          // Build Stripe URL with prefilled email +
+          // client_reference_id for the webhook to match against.
+          let target = CHECKOUT_SUBSCRIPTION_URL;
+          try {
+            const url = new URL(CHECKOUT_SUBSCRIPTION_URL);
+            if (data.email) url.searchParams.set('prefilled_email', String(data.email));
+            url.searchParams.set(
+              'client_reference_id',
+              'algo_' + Date.now().toString(36) + '_' +
+              Math.random().toString(36).slice(2, 8)
+            );
+            target = url.toString();
+          } catch (_) { /* invalid URL — fall through to raw value */ }
+
+          // Redirect in same tab so Stripe controls the flow
+          // from here. The buyer can use back-button to return.
+          window.location.href = target;
+        });
       }
 
       // Lifetime is POA — the button routes to the discovery call
