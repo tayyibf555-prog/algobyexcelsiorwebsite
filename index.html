@@ -2208,13 +2208,13 @@
     // (the discovery call) so pricing is discussed live.
     const CHECKOUT_SUBSCRIPTION_URL = '';
 
-    // OPTIONAL — admin portal lead intake URL. When set, the
-    // checkout form POSTs the buyer's name/email/phone/etc here
-    // before redirecting to Stripe, so the admin portal can show
-    // who filled the form vs who actually completed payment.
-    // For local development: 'http://localhost:4002/api/leads'
-    // For production: 'https://admin.algobyexcelsior.co.uk/api/leads'
-    const LEADS_API_URL = '';
+    // Admin portal lead intake. The marketing-site form fires a
+    // fire-and-forget POST here before redirecting to Stripe, so
+    // the admin can see who filled the form even if they never
+    // complete checkout. Same client_reference_id is sent here
+    // and to Stripe, so the webhook can correlate payment back
+    // to the form submission.
+    const LEADS_API_URL = 'https://algoleads.vercel.app/api/leads';
 
     // ==========================================================
     // INIT
@@ -2295,9 +2295,15 @@
             }));
           } catch (_) {}
 
-          // Optional — fire-and-forget POST to the admin portal
-          // so the operator can see who filled the form even if
-          // they never complete checkout.
+          // Optional — POST to the admin portal so the operator
+          // sees who filled the form even if they never complete
+          // checkout. Uses fetch with keepalive: true so the
+          // request survives the redirect to Stripe.
+          //
+          // (We deliberately don't use navigator.sendBeacon — its
+          // request must be a "simple" CORS request, but JSON
+          // requires a preflight, which sendBeacon cannot do, so
+          // the request would silently drop.)
           if (LEADS_API_URL) {
             try {
               const params = new URLSearchParams(window.location.search);
@@ -2311,18 +2317,19 @@
                 utm_medium: params.get('utm_medium') || '',
                 utm_campaign: params.get('utm_campaign') || ''
               };
-              const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
-              if (navigator.sendBeacon && navigator.sendBeacon(LEADS_API_URL, blob)) {
-                // beacon queued — fastest, doesn't block redirect
-              } else {
-                fetch(LEADS_API_URL, {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify(payload),
-                  keepalive: true
-                }).catch(() => {});
-              }
-            } catch (_) {}
+              fetch(LEADS_API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+                keepalive: true,
+                mode: 'cors',
+                credentials: 'omit'
+              })
+                .then(r => { if (!r.ok) console.warn('Lead POST failed:', r.status, r.statusText); })
+                .catch(err => console.warn('Lead POST error:', err.message));
+            } catch (e) {
+              console.warn('Lead POST setup error:', e && e.message);
+            }
           }
 
           if (!CHECKOUT_SUBSCRIPTION_URL) {
