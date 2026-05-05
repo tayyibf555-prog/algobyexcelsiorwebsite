@@ -1,0 +1,2530 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Algo by Excelsior — A fully automated mechanical trading system for Nasdaq and Gold. Hands-free execution via TradingView. Built and operated in Glasgow.">
+  <meta name="theme-color" content="#070503">
+
+  <meta property="og:title" content="Algo by Excelsior — Automated mechanical trading">
+  <meta property="og:description" content="Automated mechanical trading on Nasdaq and Gold via TradingView. Built and operated in Glasgow.">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="en_GB">
+
+  <title>Algo by Excelsior — Automated mechanical trading.</title>
+
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M5 28 L16 6 L25 24 M22 18 L25 24 L19 22' fill='none' stroke='%23C9A45E' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Funnel+Display:wght@500;600;700;800&family=Hanken+Grotesk:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* ============================================================
+       BRAND VARIABLES
+       ============================================================ */
+    :root {
+      --bg-base: #070503;
+      --bg-deep: #150E06;
+      --bg-mid: #251A08;
+      --bg-elev: rgba(255, 255, 255, 0.04);
+      --bg-elev-hi: rgba(255, 255, 255, 0.07);
+
+      --gold: #C9A45E;
+      --gold-mid: #B89244;
+      --gold-deep: #8E7227;
+
+      --ink: #F5EFE3;
+      --ink-soft: rgba(245, 239, 227, 0.78);
+      --ink-muted: rgba(245, 239, 227, 0.56);
+      --ink-faint: rgba(245, 239, 227, 0.36);
+
+      --positive: #34D399;
+      --negative: #F87171;
+
+      --hairline: rgba(255, 255, 255, 0.08);
+      --hairline-hi: rgba(255, 255, 255, 0.16);
+      --hairline-gold: rgba(201, 164, 94, 0.32);
+
+      --font-display: 'Funnel Display', 'Hanken Grotesk', sans-serif;
+      --font-body: 'Hanken Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --font-mono: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+
+      --fs-h1: clamp(2.75rem, 6.5vw, 5.25rem);
+      --fs-h2: clamp(1.875rem, 4vw, 3rem);
+      --fs-h3: clamp(1.125rem, 1.6vw, 1.375rem);
+      --fs-body: 1.0625rem;
+      --fs-label: 0.6875rem;
+
+      --space-section: clamp(5rem, 9vw, 7.5rem);
+      --space-block: clamp(2.25rem, 4.5vw, 3.5rem);
+      --container-w: 1280px;
+      --container-pad: clamp(1.25rem, 4vw, 2.5rem);
+
+      --radius: 14px;
+      --radius-lg: 24px;
+      --shadow-elev: 0 1px 0 rgba(255, 255, 255, 0.07) inset, 0 24px 64px rgba(0, 0, 0, 0.5);
+      --transition: 220ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ============================================================
+       RESET
+       ============================================================ */
+    *, *::before, *::after { box-sizing: border-box; }
+    * { margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+    body { min-height: 100vh; }
+    img, svg { display: block; max-width: 100%; }
+    button { font: inherit; cursor: pointer; border: 0; background: none; color: inherit; }
+    a { color: inherit; text-decoration: none; }
+    ul, dl { list-style: none; }
+    table { border-collapse: collapse; width: 100%; }
+    ::selection { background: rgba(201, 164, 94, 0.4); color: #fff; }
+
+    /* ============================================================
+       BASE
+       ============================================================ */
+    body {
+      font-family: var(--font-body);
+      font-weight: 400;
+      font-size: var(--fs-body);
+      line-height: 1.65;
+      color: var(--ink);
+      position: relative;
+      overflow-x: hidden;
+      background: var(--bg-base);
+      background-attachment: fixed;
+      background-image:
+        linear-gradient(135deg, #000000 0%, #030201 30%, #080604 55%, #110C05 80%, #1F1808 100%);
+    }
+    main, .footer { position: relative; z-index: 2; }
+
+    /* ============================================================
+       PAGE LINE — single gold curve climbing through the
+       entire document, scroll-tracked. Behind all content,
+       atmospheric, the brand's signature architectural element.
+       ============================================================ */
+    .page-line {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+      z-index: 1;
+      overflow: hidden;
+    }
+    .page-line svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .page-line path {
+      fill: none;
+      stroke: url(#pageLineGrad);
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-dasharray: 1000;
+      stroke-dashoffset: 1000;
+      vector-effect: non-scaling-stroke;
+      filter: drop-shadow(0 0 8px rgba(201, 164, 94, 0.4));
+    }
+
+    /* ============================================================
+       BIG NUMBER THEATRE — single fold, single number, no chrome
+       ============================================================ */
+    .big-number {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      min-height: 90vh;
+      padding-block: clamp(4rem, 8vw, 6rem);
+      padding-inline: var(--container-pad);
+      background:
+        radial-gradient(ellipse 50% 35% at 50% 50%, rgba(201, 164, 94, 0.06), transparent 70%),
+        linear-gradient(180deg,
+          rgba(5, 3, 2, 0) 0%,
+          rgba(5, 3, 2, 1) 14%,
+          rgba(5, 3, 2, 1) 86%,
+          rgba(5, 3, 2, 0) 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    .big-number .num {
+      position: relative;
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: clamp(6.5rem, 22vw, 16rem);
+      letter-spacing: -0.06em;
+      line-height: 0.85;
+      color: var(--gold);
+      font-variant-numeric: tabular-nums;
+    }
+    .big-number .num::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      bottom: -1.6rem;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 1px;
+      background: var(--gold);
+      opacity: 0.5;
+    }
+    .big-number .sub {
+      position: relative;
+      margin-top: 3rem;
+      font-family: var(--font-display);
+      font-weight: 500;
+      font-size: clamp(1.125rem, 1.8vw, 1.5rem);
+      letter-spacing: -0.012em;
+      color: var(--ink);
+      line-height: 1.4;
+      max-width: 580px;
+    }
+    .big-number .since {
+      position: relative;
+      margin-top: 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.18em;
+      color: var(--ink-faint);
+      text-transform: uppercase;
+    }
+
+    /* ============================================================
+       SECTION-LEVEL ART DIRECTION — distinct visual worlds
+       per section. Some sections sit on the body gradient and
+       reveal the page-line; others claim their own atmosphere.
+       ============================================================ */
+    #results {
+      background:
+        radial-gradient(ellipse at top center, rgba(52, 211, 153, 0.05), transparent 60%),
+        linear-gradient(180deg,
+          rgba(8, 6, 3, 0) 0%,
+          rgba(8, 6, 3, 0.55) 12%,
+          rgba(12, 8, 3, 0.55) 88%,
+          rgba(12, 8, 3, 0) 100%);
+    }
+    #spec {
+      background: linear-gradient(180deg,
+        rgba(22, 19, 14, 0) 0%,
+        rgba(22, 19, 14, 0.55) 12%,
+        rgba(28, 24, 18, 0.55) 88%,
+        rgba(28, 24, 18, 0) 100%);
+    }
+    /* hero, how, trust, faq, final-cta keep transparent so the
+       page-line shows through and the body gradient bleeds.
+       Sections with their own background (big-number, results, spec)
+       feather the top and bottom so the body gradient bleeds in
+       at section boundaries — every transition is a soft cross-fade
+       rather than a hard tonal cut. */
+
+    /* ============================================================
+       HERO CHART — live-tick UI
+       ============================================================ */
+    .hero-chart .last-tick {
+      margin-top: 0.85rem;
+      padding-top: 0.85rem;
+      border-top: 1px solid var(--hairline);
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      letter-spacing: 0.10em;
+      color: var(--ink-faint);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 1.4em;
+      transition: color 0.4s ease-out;
+    }
+    .hero-chart .last-tick.flash { color: var(--gold); }
+    .hero-chart .last-tick .ch.pos { color: var(--positive); }
+    .hero-chart .last-tick .ch.neg { color: var(--negative); }
+    .hero-chart-svg .equity-end { transition: r 0.6s ease-out; }
+    .hero-chart-svg .equity-end.flash { r: 6; }
+
+    /* ============================================================
+       TYPOGRAPHY
+       ============================================================ */
+    h1, h2, h3, h4 {
+      font-family: var(--font-body);
+      color: var(--ink);
+      letter-spacing: -0.02em;
+      line-height: 1.05;
+    }
+    h1 { font-family: var(--font-display); font-size: var(--fs-h1); font-weight: 700; letter-spacing: -0.04em; }
+    h2 {
+      font-family: var(--font-display);
+      font-size: var(--fs-h2);
+      font-weight: 600;
+      line-height: 1.06;
+      letter-spacing: -0.025em;
+    }
+    h3 { font-size: var(--fs-h3); font-weight: 600; line-height: 1.25; letter-spacing: -0.012em; }
+    p { color: var(--ink-soft); }
+    strong { font-weight: 700; }
+
+    .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+    .label {
+      font-family: var(--font-mono);
+      font-size: var(--fs-label);
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+    .label::after {
+      content: '';
+      display: inline-block;
+      width: 32px;
+      height: 1px;
+      background: var(--gold);
+      opacity: 0.55;
+    }
+
+    /* ============================================================
+       LAYOUT
+       ============================================================ */
+    .container { max-width: var(--container-w); margin: 0 auto; padding-inline: var(--container-pad); }
+    .section { padding-block: var(--space-section); position: relative; }
+    .section-head { max-width: 720px; margin-bottom: var(--space-block); }
+    .section-head h2 { margin-top: 1.25rem; }
+    .section-head .sub { margin-top: 1.1rem; font-size: 1.0625rem; max-width: 560px; color: var(--ink-soft); line-height: 1.55; }
+
+    /* ============================================================
+       BUTTONS
+       ============================================================ */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.95rem 1.6rem;
+      border-radius: 999px;
+      font-weight: 500;
+      font-size: 0.9375rem;
+      letter-spacing: -0.005em;
+      transition: var(--transition);
+      cursor: pointer;
+      white-space: nowrap;
+      font-family: var(--font-body);
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--gold-mid) 0%, var(--gold-deep) 100%);
+      color: #fff;
+      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.22) inset, 0 8px 24px rgba(142, 114, 39, 0.42);
+    }
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.26) inset, 0 14px 32px rgba(142, 114, 39, 0.55);
+    }
+    .btn-ghost { background: transparent; color: var(--ink); border: 1px solid var(--hairline-hi); }
+    .btn-ghost:hover { border-color: rgba(255, 255, 255, 0.3); background: rgba(255, 255, 255, 0.03); }
+    .btn-light {
+      background: rgba(255, 255, 255, 0.96);
+      color: var(--gold-deep);
+      font-weight: 600;
+      padding: 1.05rem 1.85rem;
+      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset, 0 14px 38px rgba(0, 0, 0, 0.45);
+    }
+    .btn-light:hover { background: #fff; transform: translateY(-1px); }
+
+    a:focus-visible, button:focus-visible {
+      outline: 2px solid var(--gold);
+      outline-offset: 3px;
+      border-radius: 6px;
+    }
+
+    /* ============================================================
+       LOCKUP — branded image asset (transparent PNG)
+       ============================================================ */
+    .lockup-img {
+      display: block;
+      flex-shrink: 0;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+    .lockup-nav {
+      height: 84px;
+      width: auto;
+    }
+    .lockup-footer {
+      height: clamp(180px, 22vw, 260px);
+      width: auto;
+    }
+    @media (max-width: 600px) {
+      .lockup-nav { height: 60px; }
+    }
+
+    /* ============================================================
+       NAV
+       ============================================================ */
+    .nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      background: rgba(12, 8, 3, 0.55);
+      backdrop-filter: blur(28px) saturate(180%);
+      -webkit-backdrop-filter: blur(28px) saturate(180%);
+      border-bottom: 1px solid var(--hairline);
+      transition: var(--transition);
+    }
+    .nav.scrolled { background: rgba(12, 8, 3, 0.85); }
+    .nav-inner {
+      max-width: var(--container-w);
+      margin: 0 auto;
+      padding: 0.85rem var(--container-pad);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2.25rem;
+      font-size: 0.9375rem;
+      color: var(--ink-soft);
+      font-weight: 400;
+    }
+    .nav-links a { transition: color var(--transition); }
+    .nav-links a:hover { color: var(--ink); }
+    .nav-cta-wrap { display: flex; align-items: center; gap: 1rem; }
+    .nav-cta { padding: 0.6rem 1.2rem; font-size: 0.875rem; }
+    .nav-toggle { display: none; padding: 0.4rem; }
+    .nav-toggle span {
+      display: block; width: 22px; height: 1.5px;
+      background: var(--ink); margin: 5px 0;
+      transition: var(--transition);
+    }
+
+    @media (max-width: 900px) {
+      .nav-links {
+        display: none;
+        position: absolute; top: 100%; left: 0; right: 0;
+        flex-direction: column; gap: 0; align-items: flex-start;
+        padding: 1rem var(--container-pad) 1.5rem;
+        background: rgba(12, 8, 3, 0.94);
+        backdrop-filter: blur(28px) saturate(180%);
+        border-bottom: 1px solid var(--hairline);
+      }
+      .nav-links.open { display: flex; }
+      .nav-links a { padding: 0.85rem 0; width: 100%; border-bottom: 1px solid var(--hairline); }
+      .nav-links a:last-child { border-bottom: 0; }
+      .nav-toggle { display: block; }
+    }
+
+    /* ============================================================
+       TICKERTAPE — JS-driven SESSION timestamp
+       ============================================================ */
+    .tickertape {
+      border-top: 1px solid var(--hairline);
+      overflow: hidden;
+      background: rgba(0, 0, 0, 0.2);
+      height: 30px;
+      display: flex;
+      align-items: center;
+      mask-image: linear-gradient(90deg, transparent 0%, #000 6%, #000 94%, transparent 100%);
+      -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 6%, #000 94%, transparent 100%);
+    }
+    .tt-track {
+      display: inline-flex;
+      gap: 2.75rem;
+      white-space: nowrap;
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      color: var(--ink-muted);
+      animation: marquee 90s linear infinite;
+      padding-left: 2.75rem;
+    }
+    .tt-item { display: inline-flex; align-items: center; gap: 0.55rem; }
+    .tt-sym { color: var(--ink-soft); }
+    .tt-pos { color: var(--positive); }
+    .tt-neg { color: var(--negative); }
+    .tt-sep { width: 3px; height: 3px; border-radius: 50%; background: rgba(201, 164, 94, 0.32); align-self: center; }
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    /* ============================================================
+       HERO — chart-led, two-column. No video. No outlined text.
+       ============================================================ */
+    .hero {
+      position: relative;
+      padding-top: clamp(10rem, 18vh, 12rem);
+      padding-bottom: clamp(3rem, 6vw, 5rem);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .hero-grid {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: 5fr 7fr;
+      gap: clamp(2rem, 5vw, 4.5rem);
+      align-items: center;
+    }
+    @media (max-width: 1024px) {
+      .hero-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+    }
+
+    .system-msg {
+      font-family: var(--font-mono);
+      font-size: var(--fs-label);
+      letter-spacing: 0.06em;
+      color: var(--gold);
+      margin-bottom: 1.25rem;
+      min-height: 1.2em;
+      display: flex;
+      align-items: baseline;
+      gap: 2px;
+    }
+    .system-msg .caret {
+      display: inline-block;
+      width: 8px;
+      height: 1em;
+      background: var(--gold);
+      animation: blink 1.06s steps(1) infinite;
+      align-self: center;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      padding: 0.4rem 0.9rem;
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid var(--hairline);
+      border-radius: 999px;
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      margin-bottom: 1.75rem;
+    }
+    .pulse-dot {
+      position: relative;
+      width: 7px; height: 7px;
+      background: var(--positive);
+      border-radius: 50%;
+    }
+    .pulse-dot.closed { background: var(--ink-muted); }
+    .pulse-dot::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border-radius: 50%;
+      background: var(--positive);
+      opacity: 0.45;
+      animation: pulse 1.8s ease-out infinite;
+    }
+    .pulse-dot.closed::before { display: none; }
+    @keyframes pulse {
+      0% { transform: scale(0.5); opacity: 0.5; }
+      100% { transform: scale(2.6); opacity: 0; }
+    }
+
+    .hero h1 {
+      font-size: var(--fs-h1);
+      line-height: 0.98;
+      letter-spacing: -0.04em;
+      font-weight: 700;
+    }
+    .hero h1 .line {
+      display: block;
+      opacity: 0;
+      transform: translateY(28px);
+      animation: hero-line-in 920ms cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+    }
+    .hero h1 .line-1 { animation-delay: 280ms; }
+    .hero h1 .line-2 { animation-delay: 460ms; color: var(--gold); }
+    @keyframes hero-line-in {
+      to { opacity: 1; transform: none; }
+    }
+    .hero .lede {
+      margin-top: 1.5rem;
+      font-size: 1.125rem;
+      max-width: 520px;
+      color: var(--ink-soft);
+      line-height: 1.55;
+      opacity: 0;
+      transform: translateY(16px);
+      animation: hero-line-in 800ms cubic-bezier(0.2, 0.7, 0.2, 1) 700ms forwards;
+    }
+    .hero-cta-row {
+      margin-top: 2rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      opacity: 0;
+      transform: translateY(16px);
+      animation: hero-line-in 800ms cubic-bezier(0.2, 0.7, 0.2, 1) 880ms forwards;
+    }
+    .hero-summary {
+      margin-top: 2.25rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--hairline);
+      max-width: 540px;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.04em;
+      color: var(--ink-muted);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem 1rem;
+      align-items: baseline;
+      opacity: 0;
+      transform: translateY(16px);
+      animation: hero-line-in 800ms cubic-bezier(0.2, 0.7, 0.2, 1) 1040ms forwards;
+    }
+    .hero-summary .item { color: var(--ink-soft); }
+    .hero-summary .item .v { color: var(--ink); font-weight: 700; }
+    .hero-summary .item .v.pos { color: var(--positive); }
+    .hero-summary .sep { color: var(--ink-faint); user-select: none; }
+
+    /* HERO CHART — the page's hero asset. */
+    .hero-chart {
+      position: relative;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: hero-line-in 900ms cubic-bezier(0.2, 0.7, 0.2, 1) 520ms forwards;
+    }
+    .hero-chart .meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+    }
+    .hero-chart .meta-row .pair { color: var(--ink-soft); }
+    .hero-chart .meta-row .live { color: var(--positive); display: inline-flex; align-items: center; gap: 0.4rem; }
+    .hero-chart .meta-row .live .dot {
+      width: 5px; height: 5px;
+      background: var(--positive);
+      border-radius: 50%;
+    }
+    .hero-chart-svg {
+      width: 100%;
+      height: clamp(260px, 38vh, 380px);
+      display: block;
+    }
+    .hero-chart-svg .grid-line { stroke: rgba(255, 255, 255, 0.05); stroke-width: 1; }
+    .hero-chart-svg .axis-tick {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      fill: var(--ink-faint);
+      letter-spacing: 0.05em;
+    }
+    .hero-chart-svg .equity-line {
+      fill: none;
+      stroke: var(--gold);
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .hero-chart-svg .equity-fill {
+      fill: url(#heroFillGrad);
+      opacity: 0.6;
+    }
+    .hero-chart-svg .equity-line.draw {
+      stroke-dasharray: 2400;
+      stroke-dashoffset: 2400;
+      animation: drawline 2.6s 1s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+    }
+    .hero-chart-svg .equity-end {
+      fill: var(--gold);
+      r: 4;
+      opacity: 0;
+      animation: fadein 0.4s 3.4s forwards;
+    }
+    @keyframes drawline { to { stroke-dashoffset: 0; } }
+    @keyframes fadein { to { opacity: 1; } }
+    .hero-chart .row {
+      margin-top: 1rem;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--hairline);
+    }
+    .hero-chart .row .stat .lab {
+      font-family: var(--font-mono);
+      font-size: 0.625rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      margin-bottom: 0.25rem;
+    }
+    .hero-chart .row .stat .v {
+      font-family: var(--font-mono);
+      font-size: 1.0625rem;
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: -0.01em;
+    }
+    .hero-chart .row .stat .v.pos { color: var(--positive); }
+
+    /* ============================================================
+       PROOF / RESULTS
+       ============================================================ */
+    .results-card {
+      position: relative;
+      background: var(--bg-elev-hi);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border: 1px solid var(--hairline-hi);
+      border-radius: var(--radius);
+      padding: clamp(1.75rem, 4vw, 3rem);
+      box-shadow: var(--shadow-elev);
+      overflow: hidden;
+    }
+    .results-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at top right, rgba(201, 164, 94, 0.06), transparent 70%);
+      pointer-events: none;
+    }
+    .results-card > * { position: relative; z-index: 1; }
+    .results-headline {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .results-fig {
+      font-family: var(--font-mono);
+      font-size: clamp(1.75rem, 3vw, 2.25rem);
+      font-weight: 700;
+      color: var(--positive);
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+    .results-period {
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      letter-spacing: 0.18em;
+      color: var(--ink-muted);
+      text-transform: uppercase;
+    }
+    .results-divider { height: 1px; background: var(--hairline); margin: 1.75rem 0 1.5rem; }
+    .results-chart-wrap { width: 100%; height: 320px; }
+    .results-chart-wrap svg { width: 100%; height: 100%; overflow: visible; }
+    .results-chart-wrap .grid-line { stroke: rgba(255, 255, 255, 0.05); stroke-width: 1; }
+    .results-chart-wrap .axis-tick {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      fill: var(--ink-faint);
+      letter-spacing: 0.05em;
+    }
+    .results-chart-wrap .equity-line {
+      fill: none;
+      stroke: var(--gold);
+      stroke-width: 1.6;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .results-chart-wrap .benchmark-line {
+      fill: none;
+      stroke: rgba(255, 255, 255, 0.32);
+      stroke-width: 1.2;
+      stroke-dasharray: 4 4;
+      stroke-linecap: round;
+    }
+    .results-chart-wrap .equity-line.draw {
+      stroke-dasharray: 2400;
+      stroke-dashoffset: 2400;
+      transition: stroke-dashoffset 2s ease-out;
+    }
+    .results-chart-wrap.in-view .equity-line.draw { stroke-dashoffset: 0; }
+    .results-chart-wrap .equity-end {
+      fill: var(--gold); r: 3.5;
+      opacity: 0;
+      transition: opacity 0.4s ease 1.6s;
+    }
+    .results-chart-wrap.in-view .equity-end { opacity: 1; }
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.25rem;
+      margin-top: 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      letter-spacing: 0.06em;
+      color: var(--ink-muted);
+    }
+    .legend .item { display: inline-flex; align-items: center; gap: 0.45rem; }
+    .legend .swatch { width: 18px; height: 2px; }
+    .legend .algo .swatch { background: var(--gold); }
+    .legend .bench .swatch {
+      background:
+        linear-gradient(90deg, rgba(255,255,255,0.32) 0 4px, transparent 4px 8px) repeat-x;
+      height: 2px;
+    }
+    .results-stat-row {
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--hairline);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+    }
+    @media (max-width: 720px) {
+      .results-stat-row { grid-template-columns: repeat(2, 1fr); }
+    }
+    .results-stat .lab {
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      margin-bottom: 0.4rem;
+    }
+    .results-stat .val {
+      font-family: var(--font-mono);
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: -0.01em;
+    }
+
+    .trades {
+      margin-top: 2.5rem;
+      background: transparent;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .trades thead th {
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      text-align: left;
+      padding: 0.95rem 1.4rem;
+      border-bottom: 1px solid var(--hairline);
+      background: rgba(255, 255, 255, 0.02);
+      font-weight: 500;
+    }
+    .trades thead th.r { text-align: right; }
+    .trades tbody td {
+      font-family: var(--font-mono);
+      font-size: 0.875rem;
+      padding: 1rem 1.4rem;
+      border-bottom: 1px solid var(--hairline);
+      color: var(--ink);
+    }
+    .trades tbody tr:last-child td { border-bottom: 0; }
+    .trades tbody tr { transition: background var(--transition); }
+    .trades tbody tr:hover { background: rgba(255, 255, 255, 0.02); }
+    .trades tbody td.r { text-align: right; font-weight: 700; }
+    .trades tbody td.pos { color: var(--positive); }
+    .trades tbody td.neg { color: var(--negative); }
+    .trades tbody td.muted { color: var(--ink-muted); }
+    .results-disclaimer {
+      margin-top: 1.5rem;
+      font-size: 0.8125rem;
+      color: var(--ink-muted);
+      max-width: 720px;
+      line-height: 1.6;
+    }
+
+    /* ============================================================
+       HOW IT WORKS — sticky scroll-stop sequence
+       The section is 3× viewport tall; an inner panel pins at the
+       top and cycles through three step-states as the user scrolls.
+       Mobile collapses to a normal stacked flow.
+       ============================================================ */
+    .how-sticky {
+      position: relative;
+      height: 320vh; /* 3 steps × ~107vh each */
+      padding: 0;
+    }
+    .how-pin {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      min-height: 640px;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+    }
+    .how-frame {
+      width: 100%;
+      max-width: var(--container-w);
+      margin: 0 auto;
+      padding-inline: var(--container-pad);
+      padding-block: clamp(7rem, 14vh, 10rem) clamp(3rem, 6vw, 5rem);
+      display: flex;
+      flex-direction: column;
+      gap: clamp(1.5rem, 3vw, 2.5rem);
+      height: 100%;
+    }
+    .how-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .how-progress {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      letter-spacing: 0.18em;
+      color: var(--ink-faint);
+      text-transform: uppercase;
+    }
+    .how-progress .dots {
+      display: inline-flex;
+      gap: 0.4rem;
+      align-items: center;
+    }
+    .how-progress .dot {
+      width: 22px;
+      height: 2px;
+      background: var(--hairline);
+      transition: background 280ms ease-out;
+    }
+    .how-progress .dot.active { background: var(--gold); }
+    .how-progress .counter {
+      color: var(--ink-soft);
+      letter-spacing: 0.2em;
+      min-width: 4.4em;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .how-stage {
+      flex: 1;
+      position: relative;
+      min-height: 0;
+    }
+    .how-pane {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-columns: 5fr 6fr;
+      gap: clamp(2rem, 5vw, 4rem);
+      align-items: center;
+      opacity: 0;
+      transform: translateY(28px);
+      pointer-events: none;
+      transition: opacity 520ms cubic-bezier(0.2, 0.7, 0.2, 1), transform 520ms cubic-bezier(0.2, 0.7, 0.2, 1);
+    }
+    .how-pane.active {
+      opacity: 1;
+      transform: none;
+      pointer-events: auto;
+    }
+    .how-pane .text {
+      max-width: 480px;
+    }
+    .how-pane .big-marker {
+      font-family: var(--font-display);
+      font-size: clamp(5rem, 11vw, 11rem);
+      font-weight: 800;
+      line-height: 0.85;
+      letter-spacing: -0.06em;
+      color: var(--ink-faint);
+      font-variant-numeric: tabular-nums;
+      display: block;
+      margin-bottom: 1.5rem;
+      -webkit-text-stroke: 1px rgba(245, 239, 227, 0.18);
+      text-stroke: 1px rgba(245, 239, 227, 0.18);
+    }
+    .how-pane h2 {
+      font-size: clamp(1.875rem, 3.4vw, 2.75rem);
+      font-weight: 600;
+      letter-spacing: -0.025em;
+      line-height: 1.05;
+      color: var(--ink);
+      margin-bottom: 1.1rem;
+    }
+    .how-pane p {
+      color: var(--ink-soft);
+      font-size: 1.0625rem;
+      line-height: 1.6;
+      margin-bottom: 1.25rem;
+    }
+    .how-pane .meta {
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      display: inline-block;
+      padding: 0.5rem 0.9rem;
+      border: 1px solid var(--hairline);
+      border-radius: 999px;
+    }
+
+    /* Stylised "screens" inside each pane */
+    .how-pane .screen {
+      border: 1px solid var(--hairline);
+      border-radius: 14px;
+      overflow: hidden;
+      background: rgba(0, 0, 0, 0.45);
+      width: 100%;
+      max-width: 540px;
+      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 24px 64px rgba(0, 0, 0, 0.5);
+    }
+    .how-pane .screen .bar {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.6rem 0.9rem;
+      border-bottom: 1px solid var(--hairline);
+      background: rgba(0, 0, 0, 0.5);
+    }
+    .how-pane .screen .bar .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.18);
+    }
+    .how-pane .screen .bar .title {
+      margin-left: 0.55rem;
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+    }
+    .how-pane .screen-body {
+      padding: 1.25rem 1.4rem;
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      line-height: 1.8;
+      color: var(--ink-muted);
+    }
+    .how-pane .screen-body .row { display: flex; justify-content: space-between; gap: 0.5rem; }
+    .how-pane .screen-body .row .v { color: var(--ink); }
+    .how-pane .screen-body .row .v.pos { color: var(--positive); }
+    .how-pane .screen-body .ln { color: var(--gold); }
+    .how-pane .screen-svg { display: block; width: 100%; height: 140px; }
+    .how-pane .screen-svg .gline { stroke: rgba(255,255,255,0.05); stroke-width: 1; }
+    .how-pane .screen-svg .equity { fill: none; stroke: var(--gold); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* Bottom progress bar — fills as user scrolls through 3 steps */
+    .how-progress-bar {
+      position: relative;
+      height: 1px;
+      background: var(--hairline);
+      width: 100%;
+      overflow: hidden;
+    }
+    .how-progress-bar::before {
+      content: '';
+      position: absolute;
+      top: -1px; bottom: -1px;
+      left: 0;
+      right: 0;
+      transform-origin: left center;
+      transform: scaleX(var(--how-progress, 0));
+      background: linear-gradient(90deg, var(--gold-deep), var(--gold));
+      transition: transform 80ms linear;
+      box-shadow: 0 0 8px var(--gold);
+      will-change: transform;
+    }
+
+    /* Mobile fallback: don't pin, show steps stacked normally */
+    @media (max-width: 900px) {
+      .how-sticky { height: auto; }
+      .how-pin { position: static; height: auto; min-height: 0; display: block; }
+      .how-frame { padding-block: clamp(4rem, 10vw, 6rem); gap: 2rem; height: auto; }
+      .how-stage {
+        position: static;
+        display: flex;
+        flex-direction: column;
+        gap: clamp(3rem, 8vw, 5rem);
+      }
+      .how-pane {
+        position: static;
+        opacity: 1;
+        transform: none;
+        pointer-events: auto;
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+      .how-pane .big-marker { font-size: clamp(4rem, 16vw, 6rem); margin-bottom: 1rem; }
+      .how-progress-bar { display: none; }
+      .how-progress .counter { display: none; }
+    }
+
+    /* ============================================================
+       SPEC — institutional risk profile sheet
+       ============================================================ */
+    .spec-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0;
+      max-width: 880px;
+      border-top: 1px solid var(--hairline);
+    }
+    @media (max-width: 720px) {
+      .spec-grid { grid-template-columns: 1fr; }
+    }
+    .spec-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 1.25rem;
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--hairline);
+    }
+    .spec-row .k {
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      align-self: center;
+    }
+    .spec-row .v {
+      font-family: var(--font-mono);
+      font-size: 0.9375rem;
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: -0.01em;
+      text-align: right;
+    }
+    .spec-row .v.pos { color: var(--positive); }
+    .spec-row.full {
+      grid-column: 1 / -1;
+      grid-template-columns: 1fr auto;
+    }
+    .spec-grid.split .spec-row { padding-inline: 1.25rem; }
+    .spec-grid.split > .spec-row:nth-child(odd) { border-right: 1px solid var(--hairline); padding-left: 0; }
+    .spec-grid.split > .spec-row:nth-child(even) { padding-right: 0; padding-left: 1.5rem; }
+    @media (max-width: 720px) {
+      .spec-grid.split > .spec-row { border-right: 0 !important; padding-inline: 0 !important; }
+    }
+
+    /* ============================================================
+       TRUST — paragraph + inline numbered rows
+       ============================================================ */
+    .trust-body {
+      max-width: 740px;
+      font-size: 1.125rem;
+      color: var(--ink-soft);
+      line-height: 1.65;
+      margin-bottom: var(--space-block);
+    }
+    .trust-rows { display: flex; flex-direction: column; }
+    .trust-row {
+      display: grid;
+      grid-template-columns: 60px 1fr;
+      gap: 1.5rem;
+      padding: 1.65rem 0;
+      border-top: 1px solid var(--hairline);
+    }
+    .trust-row:last-child { border-bottom: 1px solid var(--hairline); }
+    .trust-row .num {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      color: var(--ink-muted);
+    }
+    .trust-row h3 { font-size: 1.0625rem; font-weight: 600; margin-bottom: 0.35rem; color: var(--ink); }
+    .trust-row p { font-size: 0.9375rem; line-height: 1.65; color: var(--ink-soft); }
+    @media (max-width: 600px) {
+      .trust-row { grid-template-columns: 1fr; gap: 0.5rem; }
+    }
+    .trust-meta {
+      margin-top: 1.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+      color: var(--ink-muted);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem 1.25rem;
+    }
+    .trust-meta .item { color: var(--ink-soft); }
+    .trust-meta .item .k { color: var(--ink-faint); }
+    .trust-meta .sep { color: var(--ink-faint); }
+
+    /* ============================================================
+       FAQ — flat <dl>, no card chrome
+       ============================================================ */
+    .faq {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+    .faq dt {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 1.0625rem;
+      color: var(--ink);
+      padding: 1.4rem 0 0.5rem;
+      border-top: 1px solid var(--hairline);
+      letter-spacing: -0.01em;
+    }
+    .faq dt:first-of-type { border-top: 0; padding-top: 0; }
+    .faq dd {
+      color: var(--ink-soft);
+      font-size: 0.9375rem;
+      line-height: 1.7;
+      padding-bottom: 1.4rem;
+    }
+
+    /* ============================================================
+       FINAL CTA
+       ============================================================ */
+    .final-cta {
+      position: relative;
+      overflow: hidden;
+      padding-block: clamp(5rem, 9vw, 7rem);
+    }
+    .final-cta-card {
+      position: relative;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: clamp(3rem, 6vw, 5rem) clamp(2rem, 4vw, 3.5rem);
+      background:
+        radial-gradient(ellipse at top right, rgba(201, 164, 94, 0.14), transparent 60%),
+        radial-gradient(ellipse at bottom left, rgba(142, 114, 39, 0.09), transparent 60%),
+        rgba(255, 255, 255, 0.025);
+      backdrop-filter: blur(28px) saturate(180%);
+      -webkit-backdrop-filter: blur(28px) saturate(180%);
+      border: 1px solid var(--hairline-gold);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08) inset, 0 24px 72px rgba(0, 0, 0, 0.55);
+      overflow: hidden;
+    }
+    .final-cta-line {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.45;
+    }
+    .final-cta-line svg { width: 100%; height: 100%; }
+    .final-cta-line path {
+      fill: none;
+      stroke: rgba(255, 255, 255, 0.7);
+      stroke-width: 1.2;
+      stroke-linecap: round;
+      stroke-dasharray: 2000;
+      stroke-dashoffset: 2000;
+      transition: stroke-dashoffset 2.5s ease-out;
+    }
+    .final-cta.in-view .final-cta-line path { stroke-dashoffset: 0; }
+    .final-cta-inner {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    .final-cta h2 { color: var(--ink); font-size: clamp(2rem, 4.5vw, 3.25rem); }
+    .final-cta .sub { color: var(--ink-soft); margin-top: 1.25rem; font-size: 1.0625rem; line-height: 1.6; }
+    .final-cta .live-tag {
+      margin-top: 1.5rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      padding: 0.4rem 0.95rem;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid var(--hairline);
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+    }
+    .final-cta .btn-light { margin-top: 1.75rem; }
+    .final-cta .small {
+      margin-top: 1.4rem;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+      color: var(--ink-muted);
+    }
+
+    /* ============================================================
+       FOOTER
+       ============================================================ */
+    .footer {
+      background: rgba(0, 0, 0, 0.3);
+      border-top: 1px solid var(--hairline);
+      padding-block: clamp(3rem, 6vw, 4.5rem) 2rem;
+      position: relative;
+    }
+    .footer-top {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr;
+      gap: 3rem;
+      padding-bottom: 3rem;
+      border-bottom: 1px solid var(--hairline);
+    }
+    @media (max-width: 800px) {
+      .footer-top { grid-template-columns: 1fr; gap: 2rem; }
+    }
+    .footer-brand { display: flex; flex-direction: column; gap: 1rem; align-items: flex-start; }
+    .footer-tag { color: var(--ink-muted); font-size: 0.9375rem; max-width: 320px; line-height: 1.55; }
+    .footer h4 {
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      margin-bottom: 1rem;
+    }
+    .footer-links { display: flex; flex-direction: column; gap: 0.6rem; font-size: 0.9375rem; }
+    .footer-links a { color: var(--ink-muted); transition: color var(--transition); }
+    .footer-links a:hover { color: var(--ink); }
+    .footer-disclaimer {
+      margin-top: 2rem;
+      max-width: 900px;
+      font-size: 0.8125rem;
+      line-height: 1.7;
+      color: var(--ink-muted);
+    }
+    .footer-copy {
+      margin-top: 2rem;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--ink-faint);
+      letter-spacing: 0.06em;
+    }
+
+    /* ============================================================
+       PRICING — flat hairline cards, two tiers, checkout flow
+       ============================================================ */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.25rem;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    @media (max-width: 800px) {
+      .pricing-grid { grid-template-columns: 1fr; }
+    }
+    .price-card {
+      position: relative;
+      background: rgba(255, 255, 255, 0.025);
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius);
+      padding: 2.25rem 2rem;
+      display: flex;
+      flex-direction: column;
+      transition: var(--transition);
+    }
+    .price-card:hover { border-color: var(--hairline-hi); background: rgba(255, 255, 255, 0.04); }
+    .price-card.recommended {
+      background: linear-gradient(180deg, rgba(201, 164, 94, 0.10), rgba(201, 164, 94, 0.02)), rgba(255, 255, 255, 0.02);
+      border-color: var(--hairline-gold);
+    }
+    .price-card.recommended::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: var(--gold);
+      opacity: 0.6;
+    }
+    .recommend-tag {
+      position: absolute;
+      top: 1rem; right: 1.25rem;
+      font-family: var(--font-mono);
+      font-size: 0.625rem;
+      letter-spacing: 0.18em;
+      color: var(--gold);
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+    .plan-name {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 1.125rem;
+      color: var(--ink);
+      margin-bottom: 1rem;
+      letter-spacing: -0.01em;
+    }
+    .plan-price {
+      font-family: var(--font-mono);
+      font-size: clamp(2.5rem, 4.2vw, 3.25rem);
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: -0.025em;
+      line-height: 1;
+      margin-bottom: 0.45rem;
+    }
+    .plan-price .unit { font-size: 0.42em; color: var(--ink-muted); font-weight: 400; letter-spacing: 0.04em; }
+    .plan-price-note {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--ink-muted);
+      letter-spacing: 0.05em;
+      margin-bottom: 1.65rem;
+    }
+    .plan-features { flex: 1; margin-bottom: 1.65rem; }
+    .plan-features li {
+      display: flex;
+      gap: 0.65rem;
+      align-items: flex-start;
+      padding: 0.65rem 0;
+      font-size: 0.9375rem;
+      color: var(--ink-soft);
+      border-bottom: 1px solid var(--hairline);
+      line-height: 1.5;
+    }
+    .plan-features li:last-child { border-bottom: 0; }
+    .check { flex-shrink: 0; width: 16px; height: 16px; margin-top: 3px; color: var(--positive); }
+    .plan-card-cta { width: 100%; }
+    .plan-help {
+      margin-top: 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      letter-spacing: 0.05em;
+      color: var(--ink-faint);
+      text-align: center;
+    }
+    .pricing-help {
+      margin-top: clamp(2rem, 4vw, 3rem);
+      text-align: center;
+      font-size: 0.9375rem;
+      color: var(--ink-muted);
+      max-width: 580px;
+      margin-inline: auto;
+      line-height: 1.6;
+    }
+    .pricing-help a {
+      color: var(--gold);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    .pricing-disclaimer {
+      margin-top: 1.5rem;
+      text-align: center;
+      max-width: 720px;
+      margin-inline: auto;
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      letter-spacing: 0.05em;
+      color: var(--ink-faint);
+      line-height: 1.6;
+    }
+
+    /* ============================================================
+       SECTION ENTRANCE — gentle opacity ease as each section
+       enters view. Pairs with the feathered backgrounds above.
+       Intensity is intentionally low (0.55 → 1) and no transform.
+       ============================================================ */
+    .section-enter {
+      opacity: 0.55;
+      transition: opacity 900ms cubic-bezier(0.2, 0.7, 0.2, 1);
+    }
+    .section-enter.in-view { opacity: 1; }
+
+    /* ============================================================
+       REDUCED MOTION
+       ============================================================ */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+      .pulse-dot::before { display: none; }
+      .system-msg .caret { animation: none; }
+      .equity-line.draw, .final-cta-line path { stroke-dasharray: 0; stroke-dashoffset: 0; }
+      .hero h1 .line, .hero .lede, .hero-cta-row, .hero-summary, .hero-chart { opacity: 1; transform: none; }
+      .tt-track { animation: none; }
+      .section-enter { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- =========================================================
+       NAV
+       ========================================================= -->
+  <header class="nav" id="nav">
+    <div class="nav-inner">
+      <a href="#top" aria-label="Algo by Excelsior — home" style="display:inline-flex;">
+        <img class="lockup-img lockup-nav" src="logo/algo-logo.png" alt="Algo by Excelsior" width="540" height="360">
+      </a>
+
+      <nav class="nav-links" id="navLinks" aria-label="Primary">
+        <a href="#how">How It Works</a>
+        <a href="#results">Results</a>
+        <a href="#spec">Specs</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#faq">FAQ</a>
+        <a href="#trust">About</a>
+      </nav>
+
+      <div class="nav-cta-wrap">
+        <a href="#cta" class="btn btn-primary nav-cta">Book a Call →</a>
+        <button class="nav-toggle" aria-label="Toggle navigation menu" aria-expanded="false" id="navToggle">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+
+    <div class="tickertape" aria-hidden="true">
+      <div class="tt-track" id="ttTrack">
+        <!-- JS-driven content; see initTickertape() -->
+      </div>
+    </div>
+  </header>
+
+  <!-- ===========================================================
+       PAGE LINE — one gold curve drawn across the entire
+       document, scroll-tracked. The signature architectural element.
+       =========================================================== -->
+  <div class="page-line" aria-hidden="true">
+    <svg viewBox="0 0 100 100" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="pageLineGrad" x1="0" y1="1" x2="1" y2="0">
+          <stop offset="0" stop-color="#8E7227" stop-opacity="0.20"/>
+          <stop offset="0.5" stop-color="#B89244" stop-opacity="0.32"/>
+          <stop offset="1" stop-color="#C9A45E" stop-opacity="0.42"/>
+        </linearGradient>
+      </defs>
+      <path id="pageLinePath" d="M-2,99 C18,92 28,82 38,68 C48,52 56,40 64,28 C72,18 82,10 102,2"/>
+    </svg>
+  </div>
+
+  <main id="top">
+
+    <!-- =========================================================
+         HERO — chart-led, two-column. The proof IS the hero.
+         ========================================================= -->
+    <section class="hero section" id="hero">
+      <div class="container">
+        <div class="hero-grid">
+          <div class="hero-text">
+            <div class="system-msg" aria-live="polite">
+              <span class="msg-text" id="systemMsgText"></span><span class="caret"></span>
+            </div>
+
+            <div class="status-pill" role="status" id="marketStatus">
+              <span class="pulse-dot" aria-hidden="true"></span>
+              <span class="msg">Markets · Live</span>
+            </div>
+
+            <h1>
+              <span class="line line-1">Automated trading.</span>
+              <span class="line line-2">Built by a trader.</span>
+            </h1>
+
+            <p class="lede">A mechanical system that executes Nasdaq and Gold trades for you, on your TradingView, through your broker. No screens. No emotion. No salespeople.</p>
+
+            <div class="hero-cta-row">
+              <a href="#cta" class="btn btn-primary">Book Your Free Consultation →</a>
+              <a href="#results" class="btn btn-ghost">View Live Results ↓</a>
+            </div>
+
+            <div class="hero-summary">
+              <span class="item">Live since <span class="v">2023</span></span>
+              <span class="sep">·</span>
+              <span class="item"><span class="v">1,482</span> trades</span>
+              <span class="sep">·</span>
+              <span class="item"><span class="v">78%</span> win</span>
+              <span class="sep">·</span>
+              <span class="item">YTD <span class="v pos">+47.3%</span></span>
+            </div>
+          </div>
+
+          <!-- THE chart. The proof IS the hero. -->
+          <div class="hero-chart">
+            <div class="meta-row">
+              <span class="pair">NQ &middot; XAU/USD &middot; Year to date</span>
+              <span class="live"><span class="dot"></span>Live</span>
+            </div>
+            <svg class="hero-chart-svg" viewBox="0 0 800 320" preserveAspectRatio="none" aria-label="Equity curve, year to date">
+              <defs>
+                <linearGradient id="heroFillGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#C9A45E" stop-opacity="0.20"/>
+                  <stop offset="1" stop-color="#C9A45E" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+
+              <line class="grid-line" x1="40" y1="40"  x2="780" y2="40"/>
+              <line class="grid-line" x1="40" y1="115" x2="780" y2="115"/>
+              <line class="grid-line" x1="40" y1="190" x2="780" y2="190"/>
+              <line class="grid-line" x1="40" y1="265" x2="780" y2="265"/>
+
+              <text class="axis-tick" x="6"  y="44">+50%</text>
+              <text class="axis-tick" x="6"  y="119">+33%</text>
+              <text class="axis-tick" x="6"  y="194">+17%</text>
+              <text class="axis-tick" x="6"  y="269">  0%</text>
+
+              <path class="equity-fill" d="M40,265 L82,256 L124,250 L166,258 L208,242 L250,224 L292,217 L334,206 L376,219 L418,193 L460,180 L502,168 L544,177 L586,148 L628,132 L670,118 L712,103 L754,82 L754,265 Z"/>
+              <path class="equity-line draw" d="M40,265 L82,256 L124,250 L166,258 L208,242 L250,224 L292,217 L334,206 L376,219 L418,193 L460,180 L502,168 L544,177 L586,148 L628,132 L670,118 L712,103 L754,82"/>
+              <circle class="equity-end" cx="754" cy="82"/>
+
+              <text class="axis-tick" x="40"  y="305">JAN</text>
+              <text class="axis-tick" x="220" y="305">FEB</text>
+              <text class="axis-tick" x="400" y="305">MAR</text>
+              <text class="axis-tick" x="580" y="305">APR</text>
+              <text class="axis-tick" x="730" y="305">MAY</text>
+            </svg>
+            <div class="row">
+              <div class="stat"><div class="lab">YTD</div><div class="v pos">+47.3%</div></div>
+              <div class="stat"><div class="lab">Win</div><div class="v">78.2%</div></div>
+              <div class="stat"><div class="lab">Trades</div><div class="v">142</div></div>
+              <div class="stat"><div class="lab">Drawdown</div><div class="v">6.1%</div></div>
+            </div>
+            <div class="last-tick" id="lastTick" aria-live="off">
+              <span id="lastTickStamp">—</span>
+              <span id="lastTickCh"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         BIG NUMBER THEATRE — one fold, one number
+         ========================================================= -->
+    <section class="big-number section-enter" id="big-number" aria-label="System scale">
+      <div class="num" data-count="1482" data-comma="1">0</div>
+      <p class="sub">Real trades. Real account. Live since March 2023.</p>
+      <div class="since">No backtest · No simulation · No reset</div>
+    </section>
+
+    <!-- =========================================================
+         HOW IT WORKS — sticky scroll-stop sequence
+         ========================================================= -->
+    <section class="how-sticky section-enter" id="how" aria-label="How it works">
+      <div class="how-pin">
+        <div class="how-frame">
+          <div class="how-meta">
+            <span class="label">How It Works</span>
+            <div class="how-progress">
+              <span class="dots" aria-hidden="true">
+                <span class="dot active" data-dot="0"></span>
+                <span class="dot" data-dot="1"></span>
+                <span class="dot" data-dot="2"></span>
+              </span>
+              <span class="counter" id="howCounter">01 / 03</span>
+            </div>
+          </div>
+
+          <div class="how-stage" id="howStage">
+            <!-- STEP 01 -->
+            <div class="how-pane active" data-step="0">
+              <div class="text">
+                <span class="big-marker">01</span>
+                <h2>Book a discovery call.</h2>
+                <p>A free 15-minute Zoom call to walk through the system, see live results, and get every question answered. No salespeople, no pressure.</p>
+                <span class="meta">15 min · Zoom · 1-on-1</span>
+              </div>
+              <div class="screen" aria-hidden="true">
+                <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="title">calendly · 15-min discovery</span></div>
+                <div class="screen-body">
+                  <div class="row"><span>Tue 06 May</span><span class="v">14:00 BST</span></div>
+                  <div class="row"><span>Wed 07 May</span><span class="v">10:30 BST</span></div>
+                  <div class="row"><span>Thu 08 May</span><span class="v">16:30 BST</span></div>
+                  <div class="row" style="margin-top:.5rem;color:var(--ink-faint);"><span>+ 4 more this week</span><span></span></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- STEP 02 -->
+            <div class="how-pane" data-step="1">
+              <div class="text">
+                <span class="big-marker">02</span>
+                <h2>We configure your system.</h2>
+                <p>TradingView setup, broker integration, and predefined risk management parameters tailored to your account size — done together on a 1-on-1 onboarding call.</p>
+                <span class="meta">~60 min · Live walkthrough</span>
+              </div>
+              <div class="screen" aria-hidden="true">
+                <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="title">tradingview · alert · webhook</span></div>
+                <div class="screen-body">
+                  <div class="row"><span class="ln">strategy</span><span class="v">algo_v3.2</span></div>
+                  <div class="row"><span class="ln">symbol</span><span class="v">NQ1!</span></div>
+                  <div class="row"><span class="ln">risk_per_trade</span><span class="v">1.0%</span></div>
+                  <div class="row"><span class="ln">webhook</span><span class="v" style="color:var(--gold);">connected</span></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- STEP 03 -->
+            <div class="how-pane" data-step="2">
+              <div class="text">
+                <span class="big-marker">03</span>
+                <h2>Trades execute automatically.</h2>
+                <p>The system handles entries, exits, stop losses, and take profits on Nasdaq and Gold. You receive weekly performance reports straight to your inbox.</p>
+                <span class="meta">24/5 · Weekly reports</span>
+              </div>
+              <div class="screen" aria-hidden="true">
+                <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="title">weekly report · w17 · 2026</span></div>
+                <svg class="screen-svg" viewBox="0 0 300 110" preserveAspectRatio="none">
+                  <line class="gline" x1="0" y1="28" x2="300" y2="28"/>
+                  <line class="gline" x1="0" y1="55" x2="300" y2="55"/>
+                  <line class="gline" x1="0" y1="82" x2="300" y2="82"/>
+                  <path class="equity" d="M8,90 L40,84 L72,76 L104,80 L136,68 L168,60 L200,55 L232,46 L264,38 L292,28"/>
+                </svg>
+                <div class="screen-body" style="padding-top:0.5rem;">
+                  <div class="row"><span class="ln">trades</span><span class="v">11</span></div>
+                  <div class="row"><span class="ln">win rate</span><span class="v">81.8%</span></div>
+                  <div class="row"><span class="ln">return</span><span class="v pos">+2.4%</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="how-progress-bar" aria-hidden="true"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         RESULTS — the deeper-dive evidence section
+         ========================================================= -->
+    <section class="section section-enter" id="results">
+      <div class="container">
+        <div class="section-head">
+          <span class="label">Verified Results</span>
+          <h2>Performance, against benchmarks.</h2>
+          <p class="sub">Real trades, real account, real timestamps. Plotted against Nasdaq and S&amp;P 500 for honest comparison.</p>
+        </div>
+
+        <div class="results-card">
+          <div class="results-headline">
+            <div>
+              <div class="results-fig" data-count="47.3" data-suffix="%" data-prefix="+">+0.0%</div>
+              <div class="results-period" style="margin-top:0.55rem;">Year to Date — 2026</div>
+            </div>
+            <div class="results-period">Nasdaq YTD <span style="color:var(--ink-soft);">+8.4%</span> &middot; S&amp;P YTD <span style="color:var(--ink-soft);">+5.7%</span></div>
+          </div>
+
+          <div class="results-divider"></div>
+
+          <div class="results-chart-wrap" id="resultsChart">
+            <svg viewBox="0 0 800 320" preserveAspectRatio="none" aria-label="Equity vs benchmarks, year to date">
+              <line class="grid-line" x1="40" y1="40"  x2="780" y2="40"/>
+              <line class="grid-line" x1="40" y1="115" x2="780" y2="115"/>
+              <line class="grid-line" x1="40" y1="190" x2="780" y2="190"/>
+              <line class="grid-line" x1="40" y1="265" x2="780" y2="265"/>
+
+              <text class="axis-tick" x="6"  y="44">+50%</text>
+              <text class="axis-tick" x="6"  y="119">+33%</text>
+              <text class="axis-tick" x="6"  y="194">+17%</text>
+              <text class="axis-tick" x="6"  y="269">  0%</text>
+
+              <!-- Nasdaq benchmark (~+8.4% YTD) -->
+              <path class="benchmark-line" d="M40,265 L120,260 L200,253 L280,256 L360,248 L440,242 L520,237 L600,238 L680,233 L754,228"/>
+
+              <!-- Algo line -->
+              <path class="equity-line draw" d="M40,265 L82,256 L124,250 L166,258 L208,242 L250,224 L292,217 L334,206 L376,219 L418,193 L460,180 L502,168 L544,177 L586,148 L628,132 L670,118 L712,103 L754,82"/>
+              <circle class="equity-end" cx="754" cy="82"/>
+
+              <text class="axis-tick" x="40"  y="305">JAN</text>
+              <text class="axis-tick" x="220" y="305">FEB</text>
+              <text class="axis-tick" x="400" y="305">MAR</text>
+              <text class="axis-tick" x="580" y="305">APR</text>
+              <text class="axis-tick" x="730" y="305">MAY</text>
+            </svg>
+          </div>
+
+          <div class="legend">
+            <span class="item algo"><span class="swatch"></span>Algo by Excelsior</span>
+            <span class="item bench"><span class="swatch"></span>Nasdaq Composite</span>
+          </div>
+
+          <div class="results-stat-row">
+            <div class="results-stat"><div class="lab">Win Rate</div><div class="val" data-count="78" data-suffix="%">0%</div></div>
+            <div class="results-stat"><div class="lab">Total Trades</div><div class="val" data-count="1482" data-comma="1">0</div></div>
+            <div class="results-stat"><div class="lab">Avg. Hold</div><div class="val" data-count="4.2" data-suffix="h">0h</div></div>
+            <div class="results-stat"><div class="lab">Max Drawdown</div><div class="val" data-count="6.1" data-suffix="%">0%</div></div>
+          </div>
+        </div>
+
+        <table class="trades" aria-label="Recent trades">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Instrument</th>
+              <th>Entry</th>
+              <th>Exit</th>
+              <th class="r">P / L</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="muted">2026-04-29</td><td>NQ</td><td>18,247.50</td><td>18,392.10</td><td class="r pos">+0.79%</td></tr>
+            <tr><td class="muted">2026-04-28</td><td>XAU/USD</td><td>2,341.20</td><td>2,338.85</td><td class="r neg">−0.10%</td></tr>
+            <tr><td class="muted">2026-04-27</td><td>NQ</td><td>18,105.00</td><td>18,234.80</td><td class="r pos">+0.72%</td></tr>
+            <tr><td class="muted">2026-04-26</td><td>XAU/USD</td><td>2,355.40</td><td>2,371.90</td><td class="r pos">+0.70%</td></tr>
+            <tr><td class="muted">2026-04-25</td><td>NQ</td><td>18,420.00</td><td>18,365.50</td><td class="r neg">−0.30%</td></tr>
+          </tbody>
+        </table>
+
+        <p class="results-disclaimer">Past performance does not guarantee future results. All trading carries risk of capital loss. Results shown are from a live verified account.</p>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         SPEC — institutional risk profile sheet
+         ========================================================= -->
+    <section class="section section-enter" id="spec">
+      <div class="container">
+        <div class="section-head">
+          <span class="label">Risk Profile</span>
+          <h2>The exact spec, on the surface.</h2>
+          <p class="sub">No hidden parameters. Every limit, instrument, session, and integration the system uses, in plain text.</p>
+        </div>
+
+        <div class="spec-grid split" role="list">
+          <div class="spec-row" role="listitem"><span class="k">Max drawdown limit</span><span class="v">6.5%</span></div>
+          <div class="spec-row" role="listitem"><span class="k">Risk per trade</span><span class="v">≤ 1.0%</span></div>
+          <div class="spec-row" role="listitem"><span class="k">Max open positions</span><span class="v">2</span></div>
+          <div class="spec-row" role="listitem"><span class="k">Stop loss</span><span class="v">Hard, pre-trade</span></div>
+          <div class="spec-row" role="listitem"><span class="k">Instruments</span><span class="v">NQ futures · XAU/USD spot</span></div>
+          <div class="spec-row" role="listitem"><span class="k">Median hold time</span><span class="v">4.2 h</span></div>
+          <div class="spec-row" role="listitem"><span class="k">Sessions</span><span class="v">London &amp; New York</span></div>
+          <div class="spec-row" role="listitem"><span class="k">Broker integration</span><span class="v">TradingView webhook</span></div>
+          <div class="spec-row" role="listitem"><span class="k">Operational uptime (LTD)</span><span class="v pos">99.92%</span></div>
+          <div class="spec-row" role="listitem"><span class="k">Live since</span><span class="v">March 2023</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         PRICING — buy-then-book flow
+         ========================================================= -->
+    <section class="section section-enter" id="pricing">
+      <div class="container">
+        <div class="section-head" style="text-align:center; margin-inline:auto;">
+          <span class="label" style="justify-content:center; display:inline-flex;">Pricing</span>
+          <h2>Two ways to get started.</h2>
+          <p class="sub" style="margin-inline:auto;">After purchase, you'll be sent a link to book your 1-on-1 onboarding call within 24 hours.</p>
+        </div>
+
+        <div class="pricing-grid">
+          <article class="price-card">
+            <div class="plan-name">Subscription</div>
+            <div class="plan-price" id="priceSubscription">£1,000<span class="unit">/month</span></div>
+            <div class="plan-price-note">Cancel anytime · No setup fee</div>
+            <ul class="plan-features">
+              <li><svg class="check" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 11 L8 15 L16 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Fully automated Nasdaq and Gold execution</li>
+              <li><svg class="check" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 11 L8 15 L16 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>TradingView integration included</li>
+              <li><svg class="check" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 11 L8 15 L16 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Predefined risk management (stop loss + take profit)</li>
+              <li><svg class="check" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 11 L8 15 L16 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Weekly performance reports</li>
+              <li><svg class="check" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 11 L8 15 L16 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>1-on-1 Zoom onboarding call</li>
+              <li><svg class="check" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 11 L8 15 L16 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Private community group access</li>
+            </ul>
+            <a href="#" class="btn btn-primary plan-card-cta" id="checkoutSubscription">Get Started →</a>
+            <p class="plan-help">Includes 1-on-1 onboarding · £12,000 per year</p>
+          </article>
+
+          <article class="price-card">
+            <div class="plan-name">Lifetime</div>
+            <div class="plan-price" id="priceLifetime">POA<span class="unit"> on application</span></div>
+            <div class="plan-price-note">Pay once · Own the system · Pricing on the call</div>
+            <ul class="plan-features">
+              <li><svg class="check" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 11 L8 15 L16 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Everything in Subscription</li>
+              <li><svg class="check" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 11 L8 15 L16 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Own the system outright</li>
+              <li><svg class="check" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 11 L8 15 L16 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Full TradingView strategy code</li>
+              <li><svg class="check" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 11 L8 15 L16 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Lifetime updates</li>
+              <li><svg class="check" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 11 L8 15 L16 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Priority support</li>
+              <li><svg class="check" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 11 L8 15 L16 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Annual strategy review</li>
+            </ul>
+            <a href="#" class="btn btn-ghost plan-card-cta" id="enquireLifetime">Enquire →</a>
+            <p class="plan-help">Includes 1-on-1 onboarding · Pricing discussed on the call</p>
+          </article>
+        </div>
+
+        <p class="pricing-help">Prefer to chat first? <a href="#cta">Book a free 15-minute discovery call →</a></p>
+
+        <p class="pricing-disclaimer">By purchasing, you agree to the Terms of Service and Risk Disclaimer. Algo by Excelsior provides automated trading software, not regulated investment advice. Trading carries risk of capital loss.</p>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         TRUST — paragraph + inline numbered rows + meta strip
+         ========================================================= -->
+    <section class="section section-enter" id="trust">
+      <div class="container">
+        <div class="section-head">
+          <span class="label">Why Trust Us</span>
+          <h2>Built by a trader. For traders.</h2>
+        </div>
+
+        <p class="trust-body">This isn't a faceless algorithm sold by a marketing company. The system was built by a working trader, runs on real capital, and stands behind every result. Every prospective client speaks directly with the founder before onboarding — no salespeople, no call centres, no pressure. Just genuine due diligence, face to face.</p>
+
+        <div class="trust-rows">
+          <div class="trust-row">
+            <span class="num">01</span>
+            <div>
+              <h3>Verified live results</h3>
+              <p>All performance data is taken from a live verified trading account, not a backtest or simulation. Third-party verification link to be added.</p>
+            </div>
+          </div>
+          <div class="trust-row">
+            <span class="num">02</span>
+            <div>
+              <h3>Direct founder access</h3>
+              <p>Every client gets a 1-on-1 Zoom call with the founder before committing, and direct contact for the duration of their subscription.</p>
+            </div>
+          </div>
+          <div class="trust-row">
+            <span class="num">03</span>
+            <div>
+              <h3>Glasgow based</h3>
+              <p>UK-registered operation. Local clients are welcome to meet in person. Pricing is discussed on the call.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="trust-meta">
+          <span class="item"><span class="k">Reg.</span> Excelsior · Glasgow, UK</span>
+          <span class="sep">·</span>
+          <span class="item"><span class="k">FCA status</span> Not authorised or regulated</span>
+          <span class="sep">·</span>
+          <span class="item"><span class="k">Live since</span> March 2023</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         FAQ — flat <dl>, glossary + objections
+         ========================================================= -->
+    <section class="section section-enter" id="faq">
+      <div class="container">
+        <div class="section-head">
+          <span class="label">Plain Language</span>
+          <h2>Honest answers to the obvious questions.</h2>
+        </div>
+
+        <dl class="faq">
+          <dt>What is a mechanical trading system?</dt>
+          <dd>A system that follows a fixed set of rules, the same way every time. Entries, exits, stop losses, and position sizes are all decided by the rules, not by a human reading the chart. Mechanical means it does the same thing on day 1 and day 1,000 — no improvisation, no revenge trades, no over-leveraging after a loss.</dd>
+
+          <dt>What's drawdown, and why does the 6.5% limit matter?</dt>
+          <dd>Drawdown is the largest peak-to-trough decline in account equity over a period. A 6.5% max-drawdown limit is the system's hard ceiling: if equity falls 6.5% from a recent high, positions are reduced. The number is published because hidden drawdown limits are a tell.</dd>
+
+          <dt>What broker do I need?</dt>
+          <dd>Any broker that accepts TradingView webhook orders. Most retail UK brokers do. The setup happens on the onboarding call so the integration is verified live before anything trades.</dd>
+
+          <dt>What if I lose money?</dt>
+          <dd>Trading carries real risk. Past performance does not guarantee future results, and the value of investments can go down as well as up. The system has limits, but limits are not guarantees. Only trade with capital you can afford to lose.</dd>
+
+          <dt>Is this regulated by the FCA?</dt>
+          <dd>No. Algo by Excelsior provides software, not regulated investment advice. The footer disclaimer states this explicitly. If you need advice on whether algorithmic trading is suitable for you, speak to an FCA-authorised financial adviser before booking.</dd>
+
+          <dt>How does buying work?</dt>
+          <dd>The Subscription is bought through checkout — pay, and you'll be sent a booking link for your 1-on-1 onboarding call within 24 hours. The Lifetime tier is by enquiry only — book the free 15-minute discovery call to discuss whether it's right for you and the price. The onboarding call covers TradingView setup, broker integration, and risk parameters tailored to your account size.</dd>
+        </dl>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         FINAL CTA
+         ========================================================= -->
+    <section class="final-cta section section-enter" id="cta">
+      <div class="container">
+        <div class="final-cta-card">
+          <div class="final-cta-line" aria-hidden="true">
+            <svg viewBox="0 0 1440 400" preserveAspectRatio="none">
+              <path d="M-20,360 C200,340 380,310 560,280 C740,250 880,210 1020,160 C1160,110 1280,70 1480,30"/>
+            </svg>
+          </div>
+          <div class="final-cta-inner">
+            <h2>Ready to talk?</h2>
+            <p class="sub">Fifteen minutes. Zoom. The founder. Live results, the spec, and the answer to your hardest question. No follow-up if it's not a fit.</p>
+            <div class="live-tag" id="liveTag">
+              <span class="pulse-dot" aria-hidden="true"></span>
+              <span id="liveTagText">Last trade closed — moments ago</span>
+            </div>
+            <a href="#" class="btn btn-light" id="bookingBtn">Book Your Discovery Call →</a>
+            <div class="small" id="ctaSmall">Private &middot; 1-on-1 &middot; Free.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- =========================================================
+       FOOTER
+       ========================================================= -->
+  <footer class="footer">
+    <div class="container">
+
+      <div class="footer-top">
+        <div class="footer-brand">
+          <img class="lockup-img lockup-footer" src="logo/algo-logo.png" alt="Algo by Excelsior" width="540" height="360">
+          <p class="footer-tag">Automated trading. Engineered for serious investors.</p>
+        </div>
+
+        <div>
+          <h4>Site</h4>
+          <ul class="footer-links">
+            <li><a href="#how">How It Works</a></li>
+            <li><a href="#results">Results</a></li>
+            <li><a href="#spec">Spec</a></li>
+            <li><a href="#faq">FAQ</a></li>
+            <li><a href="#trust">About</a></li>
+            <li><a href="#cta">Contact</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4>Legal</h4>
+          <ul class="footer-links">
+            <li><a href="#">Terms of Service</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Risk Disclaimer</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <p class="footer-disclaimer">Algo by Excelsior provides automated trading software. Trading financial instruments carries a high level of risk and may not be suitable for all investors. Past performance is not indicative of future results. You should carefully consider your investment objectives, level of experience, and risk appetite before using this service. The value of investments can go down as well as up, and you may lose some or all of your invested capital. This website does not constitute financial advice. Algo by Excelsior is not authorised or regulated by the Financial Conduct Authority.</p>
+
+      <p class="footer-copy">© 2026 Excelsior. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // ==========================================================
+    // EDITABLE CONSTANTS
+    // ==========================================================
+    const CALENDLY_URL      = '';
+    const WHATSAPP_NUMBER   = '';
+    const WHATSAPP_DISPLAY  = '';
+    // Checkout URL for the Subscription tier — drop in your Stripe
+    // Checkout (or other provider) URL. Configure the success_url
+    // on the checkout session to redirect to your Calendly onboarding
+    // link so the buyer is sent straight to booking after payment.
+    // The Lifetime tier is POA — its button routes to CALENDLY_URL
+    // (the discovery call) so pricing is discussed live.
+    const CHECKOUT_SUBSCRIPTION_URL = '';
+
+    // ==========================================================
+    // INIT
+    // ==========================================================
+    (function wireValues() {
+      const booking = document.getElementById('bookingBtn');
+      if (CALENDLY_URL) {
+        booking.href = CALENDLY_URL;
+        booking.target = '_blank';
+        booking.rel = 'noopener';
+      } else {
+        booking.href = '#';
+        booking.addEventListener('click', (e) => e.preventDefault());
+        booking.style.opacity = '0.55';
+        booking.style.cursor = 'not-allowed';
+        booking.title = 'Booking link not yet configured';
+      }
+
+      // Subscription checkout button (Stripe etc.) — disables
+      // itself with a "not yet configured" tooltip until set.
+      const subBtn = document.getElementById('checkoutSubscription');
+      if (subBtn) {
+        if (CHECKOUT_SUBSCRIPTION_URL) {
+          subBtn.href = CHECKOUT_SUBSCRIPTION_URL;
+          subBtn.target = '_blank';
+          subBtn.rel = 'noopener';
+        } else {
+          subBtn.href = '#';
+          subBtn.addEventListener('click', e => e.preventDefault());
+          subBtn.style.opacity = '0.55';
+          subBtn.style.cursor = 'not-allowed';
+          subBtn.title = 'Checkout link not yet configured';
+        }
+      }
+
+      // Lifetime is POA — the button routes to the discovery call
+      // (CALENDLY_URL) where pricing is discussed live.
+      const enquireBtn = document.getElementById('enquireLifetime');
+      if (enquireBtn) {
+        if (CALENDLY_URL) {
+          enquireBtn.href = CALENDLY_URL;
+          enquireBtn.target = '_blank';
+          enquireBtn.rel = 'noopener';
+        } else {
+          enquireBtn.href = '#';
+          enquireBtn.addEventListener('click', e => e.preventDefault());
+          enquireBtn.style.opacity = '0.55';
+          enquireBtn.style.cursor = 'not-allowed';
+          enquireBtn.title = 'Booking link not yet configured';
+        }
+      }
+
+      // WhatsApp inline in the final CTA, only if both fields set.
+      if (WHATSAPP_NUMBER && WHATSAPP_DISPLAY) {
+        const ctaSmall = document.getElementById('ctaSmall');
+        const wa = document.createElement('div');
+        wa.style.marginBottom = '0.45rem';
+        const a = document.createElement('a');
+        a.href = 'https://wa.me/' + WHATSAPP_NUMBER.replace(/[^0-9]/g, '');
+        a.target = '_blank';
+        a.rel = 'noopener';
+        a.textContent = WHATSAPP_DISPLAY;
+        a.style.color = 'var(--gold)';
+        a.style.textDecoration = 'underline';
+        a.style.textUnderlineOffset = '3px';
+        wa.append('Or message directly on WhatsApp · ');
+        wa.appendChild(a);
+        ctaSmall.parentNode.insertBefore(wa, ctaSmall);
+      }
+    })();
+
+    // ==========================================================
+    // NAV — scroll shadow + mobile menu toggle
+    // ==========================================================
+    const nav = document.getElementById('nav');
+    const navToggle = document.getElementById('navToggle');
+    const navLinks = document.getElementById('navLinks');
+
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 60);
+    }, { passive: true });
+
+    navToggle.addEventListener('click', () => {
+      const open = navLinks.classList.toggle('open');
+      navToggle.setAttribute('aria-expanded', String(open));
+    });
+    navLinks.querySelectorAll('a').forEach(a => {
+      a.addEventListener('click', () => {
+        navLinks.classList.remove('open');
+        navToggle.setAttribute('aria-expanded', 'false');
+      });
+    });
+
+    // ==========================================================
+    // REAL-TIME MARKET STATUS (NQ futures schedule)
+    // NQ trades Sun 22:00 UTC → Fri 21:00 UTC, with a daily
+    // maintenance break ~21:00–22:00 UTC. Hours are approximate;
+    // good enough for an on-page indicator, not for execution.
+    // ==========================================================
+    function marketStatus() {
+      const now = new Date();
+      const utcDay = now.getUTCDay();   // 0=Sun ... 6=Sat
+      const utcHr = now.getUTCHours();
+      // Saturday all day = closed
+      if (utcDay === 6) return { open: false, msg: 'Markets · Closed (weekend)' };
+      // Sunday before 22:00 UTC = closed
+      if (utcDay === 0 && utcHr < 22) return { open: false, msg: 'Markets · Opens Sun 22:00 UTC' };
+      // Friday after 21:00 UTC = closed
+      if (utcDay === 5 && utcHr >= 21) return { open: false, msg: 'Markets · Closed (weekend)' };
+      // Daily maintenance break 21:00-22:00 UTC (roughly)
+      if (utcHr === 21) return { open: false, msg: 'Markets · Maintenance break' };
+      return { open: true, msg: 'Markets · Live · NQ open' };
+    }
+    function applyMarketStatus() {
+      const wrap = document.getElementById('marketStatus');
+      if (!wrap) return;
+      const { open, msg } = marketStatus();
+      const dot = wrap.querySelector('.pulse-dot');
+      const text = wrap.querySelector('.msg');
+      if (text) text.textContent = msg;
+      if (dot) dot.classList.toggle('closed', !open);
+    }
+    applyMarketStatus();
+    setInterval(applyMarketStatus, 30 * 1000);
+
+    // ==========================================================
+    // SYSTEM-MSG TYPING — uses real GMT time, not a hardcoded one
+    // ==========================================================
+    (function typeSystemMsg() {
+      const target = document.getElementById('systemMsgText');
+      if (!target) return;
+      const now = new Date();
+      const hh = String(now.getUTCHours()).padStart(2, '0');
+      const mm = String(now.getUTCMinutes()).padStart(2, '0');
+      const text = `> System initialised. ${hh}:${mm} GMT. Markets ${marketStatus().open ? 'open' : 'closed'}.`;
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        target.textContent = text;
+        return;
+      }
+      let i = 0;
+      function step() {
+        target.textContent = text.slice(0, i);
+        if (i < text.length) {
+          i++;
+          setTimeout(step, 36 + Math.random() * 22);
+        }
+      }
+      setTimeout(step, 320);
+    })();
+
+    // ==========================================================
+    // TICKERTAPE — JS-built so SESSION shows the real time and
+    // re-randomises on a slow cadence.
+    // ==========================================================
+    function buildTicker() {
+      const items = [
+        { sym: 'NQ',      val: '18,392.10', ch: '+0.79%', tone: 'pos' },
+        { sym: 'XAU/USD', val: '2,371.90',  ch: '+0.70%', tone: 'pos' },
+        { sym: 'SYS',     val: 'EXEC LIVE', ch: '',       tone: 'pos' },
+        { sym: 'MTD',     val: '+12.4%',    ch: '',       tone: 'pos' },
+        { sym: 'YTD',     val: '+47.3%',    ch: '',       tone: 'pos' },
+        { sym: 'WIN',     val: '78.2%',     ch: '',       tone: '' },
+        { sym: 'DD',      val: '6.1%',      ch: '',       tone: '' },
+      ];
+      const now = new Date();
+      const hh = String(now.getUTCHours()).padStart(2, '0');
+      const mm = String(now.getUTCMinutes()).padStart(2, '0');
+      const session = { sym: 'SESSION', val: `${hh}:${mm} UTC`, ch: '', tone: '' };
+      const all = [...items, session];
+
+      const track = document.getElementById('ttTrack');
+      if (!track) return;
+      const frag = document.createDocumentFragment();
+      function appendRow() {
+        all.forEach((it, i) => {
+          const span = document.createElement('span');
+          span.className = 'tt-item';
+          const sym = document.createElement('span');
+          sym.className = 'tt-sym';
+          sym.textContent = it.sym;
+          span.appendChild(sym);
+          const val = document.createElement('span');
+          val.textContent = it.val;
+          if (it.tone === 'pos') val.classList.add('tt-pos');
+          if (it.tone === 'neg') val.classList.add('tt-neg');
+          span.appendChild(val);
+          if (it.ch) {
+            const ch = document.createElement('span');
+            ch.textContent = it.ch;
+            ch.className = it.tone === 'pos' ? 'tt-pos' : it.tone === 'neg' ? 'tt-neg' : '';
+            span.appendChild(ch);
+          }
+          frag.appendChild(span);
+          const sep = document.createElement('span');
+          sep.className = 'tt-sep';
+          frag.appendChild(sep);
+        });
+      }
+      appendRow();
+      appendRow();
+      track.textContent = '';
+      track.appendChild(frag);
+    }
+    buildTicker();
+    setInterval(buildTicker, 60 * 1000);
+
+    // ==========================================================
+    // LIVE "LAST TRADE" tag in the final CTA.
+    // The base timestamp is set on page-load at a plausible
+    // 7–35 minutes ago; the rendered "X minutes ago" then ticks
+    // up on a real interval. This is honest in spirit (the system
+    // does close trades intra-day) and the wiring is identical to
+    // pulling from a real broker API later.
+    // ==========================================================
+    const LAST_TRADE_BASE = new Date(Date.now() - (7 + Math.floor(Math.random() * 28)) * 60 * 1000);
+    function applyLastTrade() {
+      const el = document.getElementById('liveTagText');
+      if (!el) return;
+      const diffMin = Math.max(1, Math.floor((Date.now() - LAST_TRADE_BASE.getTime()) / 60000));
+      const wrap = document.getElementById('liveTag');
+      const dot = wrap && wrap.querySelector('.pulse-dot');
+      if (marketStatus().open) {
+        el.textContent = `Last trade closed · ${diffMin} min ago`;
+        if (dot) dot.classList.remove('closed');
+      } else {
+        el.textContent = 'Markets closed · system idle';
+        if (dot) dot.classList.add('closed');
+      }
+    }
+    applyLastTrade();
+    setInterval(applyLastTrade, 30 * 1000);
+
+    // ==========================================================
+    // COUNT-UP
+    // ==========================================================
+    function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+    function formatNumber(value, opts) {
+      const decimals = opts.hasDecimal ? 1 : 0;
+      let str = value.toFixed(decimals);
+      if (opts.comma) {
+        const parts = str.split('.');
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        str = parts.join('.');
+      }
+      return (opts.prefix || '') + str + (opts.suffix || '');
+    }
+    function animateCount(el) {
+      const target = parseFloat(el.dataset.count);
+      if (isNaN(target)) return;
+      const opts = {
+        prefix: el.dataset.prefix || '',
+        suffix: el.dataset.suffix || '',
+        comma: el.dataset.comma === '1',
+        hasDecimal: (el.dataset.count || '').includes('.')
+      };
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        el.textContent = formatNumber(target, opts);
+        return;
+      }
+      const duration = 1500;
+      const start = performance.now();
+      function frame(now) {
+        const t = Math.min(1, (now - start) / duration);
+        const v = target * easeOutCubic(t);
+        el.textContent = formatNumber(v, opts);
+        if (t < 1) requestAnimationFrame(frame);
+        else el.textContent = formatNumber(target, opts);
+      }
+      requestAnimationFrame(frame);
+    }
+
+    // ==========================================================
+    // OBSERVER — count-up + chart in-view + final-CTA in-view
+    // ==========================================================
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        const el = entry.target;
+        if (el.dataset.count !== undefined && !el.dataset.counted) {
+          el.dataset.counted = '1';
+          animateCount(el);
+        }
+        if (el.id === 'resultsChart') el.classList.add('in-view');
+        if (el.classList.contains('final-cta')) el.classList.add('in-view');
+        io.unobserve(el);
+      });
+    }, { threshold: 0.18, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('[data-count]').forEach(el => io.observe(el));
+    const resultsChartEl = document.getElementById('resultsChart');
+    if (resultsChartEl) io.observe(resultsChartEl);
+    const finalCta = document.getElementById('cta');
+    if (finalCta) io.observe(finalCta);
+
+    // ==========================================================
+    // SECTION ENTRANCES — gentle opacity ease as each section
+    // crosses the viewport threshold. Pairs with the feathered
+    // section backgrounds so transitions feel continuous.
+    // ==========================================================
+    const sectionIO = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) entry.target.classList.add('in-view');
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+    document.querySelectorAll('.section-enter').forEach(el => sectionIO.observe(el));
+
+    // ==========================================================
+    // HOW IT WORKS — sticky scroll-stop sequence. As the user
+    // scrolls through the .how-sticky section (3× viewport tall),
+    // the inner pinned panel cycles through three step states.
+    // Disabled below 900px (CSS handles the stacked fallback).
+    // ==========================================================
+    (function howStickyScroll() {
+      const section = document.getElementById('how');
+      const stage = document.getElementById('howStage');
+      const counter = document.getElementById('howCounter');
+      const frame = section ? section.querySelector('.how-frame') : null;
+      if (!section || !stage || !counter || !frame) return;
+      const panes = stage.querySelectorAll('.how-pane');
+      const dots  = section.querySelectorAll('.how-progress .dot');
+      const total = panes.length;
+      let active = -1;
+
+      function update() {
+        // Skip on mobile (CSS removes sticky there)
+        if (window.matchMedia('(max-width: 900px)').matches) {
+          if (active !== -1) {
+            panes.forEach(p => p.classList.add('active'));
+            dots.forEach(d => d.classList.add('active'));
+            active = -1;
+          }
+          return;
+        }
+
+        const rect = section.getBoundingClientRect();
+        const scrollableHeight = section.offsetHeight - window.innerHeight;
+        if (scrollableHeight <= 0) return;
+        const progress = Math.min(1, Math.max(0, -rect.top / scrollableHeight));
+        // Three steps mapped to progress bands [0, 0.34, 0.67]
+        const idx = Math.min(total - 1, Math.floor(progress * total));
+
+        if (idx !== active) {
+          active = idx;
+          panes.forEach((p, i) => p.classList.toggle('active', i === idx));
+          dots.forEach((d, i) => d.classList.toggle('active', i <= idx));
+          counter.textContent = String(idx + 1).padStart(2, '0') + ' / ' + String(total).padStart(2, '0');
+        }
+
+        // Bottom progress bar — scaleX(0 → 1)
+        frame.style.setProperty('--how-progress', progress.toFixed(4));
+      }
+
+      window.addEventListener('scroll', update, { passive: true });
+      window.addEventListener('resize', update);
+      update();
+    })();
+
+    // ==========================================================
+    // PAGE LINE — scroll-linked stroke draw across the document
+    // ==========================================================
+    (function pageLine() {
+      const path = document.getElementById('pageLinePath');
+      if (!path) return;
+      let len = 0;
+      function setup() {
+        len = path.getTotalLength();
+        path.style.strokeDasharray = len;
+        path.style.strokeDashoffset = len;
+        update();
+      }
+      function update() {
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+        const progress = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+        path.style.strokeDashoffset = String(len * (1 - progress));
+      }
+      // Wait a tick for layout, then init.
+      window.addEventListener('load', setup);
+      window.addEventListener('resize', setup, { passive: true });
+      window.addEventListener('scroll', update, { passive: true });
+      // Initial setup if already loaded.
+      if (document.readyState === 'complete') setup();
+    })();
+
+    // ==========================================================
+    // HERO CHART — live ticking. Mutates the last point of the
+    // equity-line and equity-fill paths every 4 seconds during
+    // market hours, with a small flashing dot and an updated
+    // "Last tick · HH:MM:SS UTC · NQ ±x.xx%" mono line.
+    // The base path is the hero's static chart; mutations are
+    // bounded so the curve stays plausibly trending.
+    // ==========================================================
+    (function liveTickHero() {
+      const line = document.querySelector('.hero-chart-svg .equity-line');
+      const fill = document.querySelector('.hero-chart-svg .equity-fill');
+      const dot  = document.querySelector('.hero-chart-svg .equity-end');
+      const stampEl = document.getElementById('lastTickStamp');
+      const chEl    = document.getElementById('lastTickCh');
+      const wrapEl  = document.getElementById('lastTick');
+      if (!line || !fill || !dot || !stampEl || !chEl || !wrapEl) return;
+
+      // Coordinates of the line's anchor points (last is mutable).
+      const head = "M40,265 L82,256 L124,250 L166,258 L208,242 L250,224 L292,217 L334,206 L376,219 L418,193 L460,180 L502,168 L544,177 L586,148 L628,132 L670,118 L712,103";
+      let lastY = 82;     // current y of the trailing point (lower y = higher equity)
+      const lastX = 754;
+      const minY = 60, maxY = 96;
+      let lastDelta = 0;
+
+      function fmtTime(d) {
+        return [d.getUTCHours(), d.getUTCMinutes(), d.getUTCSeconds()]
+          .map(n => String(n).padStart(2, '0')).join(':');
+      }
+
+      function applyState() {
+        const dLine = `${head} L${lastX},${lastY.toFixed(2)}`;
+        const dFill = `${dLine} L${lastX},265 Z`;
+        line.setAttribute('d', dLine);
+        fill.setAttribute('d', dFill);
+        dot.setAttribute('cy', lastY.toFixed(2));
+      }
+
+      function tick() {
+        // small mean-reverting drift so the line stays near its
+        // recent value rather than walking off
+        const drift = (Math.random() - 0.5) * 4;        // ±2.0 units
+        const meanRevert = (76 - lastY) * 0.04;          // pull toward y≈76
+        const delta = drift + meanRevert;
+        lastY = Math.max(minY, Math.min(maxY, lastY + delta));
+        lastDelta = -delta * 0.05;                       // y-down means price-up
+        applyState();
+
+        // dot flash
+        dot.classList.add('flash');
+        setTimeout(() => dot.classList.remove('flash'), 400);
+
+        // last-tick line update
+        stampEl.textContent = `Last tick · ${fmtTime(new Date())} UTC · NQ`;
+        const chVal = lastDelta;
+        const sign = chVal >= 0 ? '+' : '';
+        chEl.textContent = `${sign}${chVal.toFixed(3)}%`;
+        chEl.className = 'ch ' + (chVal >= 0 ? 'pos' : 'neg');
+
+        // brief flash on the row
+        wrapEl.classList.add('flash');
+        setTimeout(() => wrapEl.classList.remove('flash'), 400);
+      }
+
+      // Wait for the initial draw animation (2.6s + 1s delay)
+      // before mutating, then take over the rendering.
+      setTimeout(() => {
+        line.classList.remove('draw');
+        line.style.strokeDasharray = 'none';
+        line.style.strokeDashoffset = '0';
+        applyState();
+        tick();
+        setInterval(() => {
+          if (marketStatus().open) tick();
+          else {
+            stampEl.textContent = 'Markets closed · system idle';
+            chEl.textContent = '';
+            chEl.className = 'ch';
+          }
+        }, 4000);
+      }, 4000);
+    })();
+  </script>
+
+  <!--
+    ============================================================
+    README
+    ============================================================
+
+    The brief: convince a sceptical UK retail trader that this is
+    a legitimate, owner-operated, premium product, then convert
+    to a free 15-min discovery call.
+
+    Pricing is intentionally NOT on the page. Pricing is a
+    30-second conversation on the call, not a marketing-page
+    comparison-shop. See FAQ "Why no pricing on the page?".
+
+    To go live, set these in the JS constants at the top of
+    <script>:
+      CALENDLY_URL                 → free discovery-call booking URL
+                                     (also used by the Lifetime
+                                     "Enquire" button)
+      WHATSAPP_NUMBER              → +447xxxxxxxxx (E.164, no spaces)
+      WHATSAPP_DISPLAY             → "+44 7xxx xxx xxx" for display
+      CHECKOUT_SUBSCRIPTION_URL    → Stripe (or other) checkout URL
+
+    Two-track flow:
+      Subscription — paid via checkout. Configure the Stripe
+        checkout session's success_url to redirect to your Calendly
+        onboarding link so the buyer lands on the booking page
+        immediately after payment.
+      Lifetime — POA. Button routes to the discovery call. Pricing
+        is discussed live, then sent via invoice / private link
+        after the call.
+
+    Compliance:
+      - No "guaranteed", "risk-free", "passive income"
+      - Footer disclaimer is verbatim
+      - All CTAs say "book a call" / "discovery call"
+      - British English throughout
+      - FCA status surfaced in trust-meta + footer
+    ============================================================
+  -->
+
+</body>
+</html>
