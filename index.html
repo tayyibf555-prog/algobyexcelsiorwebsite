@@ -885,6 +885,152 @@
       max-width: 720px;
       line-height: 1.6;
     }
+    .results-note {
+      margin-top: 1.4rem;
+      padding-top: 1.25rem;
+      border-top: 1px dashed var(--hairline);
+      font-size: 0.8125rem;
+      color: var(--ink-muted);
+      line-height: 1.6;
+    }
+
+    /* Architecture: Classic ORB + Revised FVG */
+    .arch-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+      margin: 0 0 2.5rem;
+    }
+    @media (max-width: 720px) {
+      .arch-row { grid-template-columns: 1fr; }
+    }
+    .arch-cell {
+      border: 1px solid var(--hairline);
+      border-radius: 14px;
+      padding: 1.6rem 1.75rem;
+      background: rgba(255, 255, 255, 0.012);
+      transition: border-color var(--transition);
+    }
+    .arch-cell:hover { border-color: var(--hairline-hi); }
+    .arch-cell .label { margin-bottom: 0.85rem; }
+    .arch-cell h3 {
+      font-family: var(--font-display);
+      font-size: clamp(1.25rem, 2.5vw, 1.5rem);
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+      margin-bottom: 0.55rem;
+    }
+    .arch-cell p {
+      font-size: 0.9375rem;
+      line-height: 1.6;
+      color: var(--ink-soft);
+    }
+
+    /* Configurations */
+    .config-block {
+      margin: 3rem 0 0;
+      padding-top: 2.5rem;
+      border-top: 1px solid var(--hairline);
+    }
+    .config-block .label { margin-bottom: 0.75rem; }
+    .config-block h3 {
+      font-family: var(--font-display);
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      font-weight: 600;
+      letter-spacing: -0.015em;
+      color: var(--ink);
+      margin-bottom: 0.6rem;
+    }
+    .config-sub {
+      max-width: 64ch;
+      color: var(--ink-soft);
+      font-size: 0.9375rem;
+      line-height: 1.6;
+      margin-bottom: 1.75rem;
+    }
+    .config-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1rem;
+    }
+    .config-item {
+      border: 1px solid var(--hairline);
+      border-radius: 12px;
+      padding: 1.25rem 1.4rem;
+      background: rgba(255, 255, 255, 0.012);
+    }
+    .config-item p {
+      font-size: 0.875rem;
+      line-height: 1.55;
+      color: var(--ink-soft);
+    }
+    .config-tag {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--gold);
+      border: 1px solid var(--hairline-gold);
+      border-radius: 999px;
+      padding: 0.18rem 0.6rem;
+      margin-bottom: 0.85rem;
+      background: rgba(201, 164, 94, 0.06);
+    }
+
+    /* Risk considerations */
+    .risk-block {
+      margin: 3rem 0 0;
+      padding-top: 2.5rem;
+      border-top: 1px solid var(--hairline);
+    }
+    .risk-block .label { margin-bottom: 0.75rem; }
+    .risk-block h3 {
+      font-family: var(--font-display);
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      font-weight: 600;
+      letter-spacing: -0.015em;
+      color: var(--ink);
+      margin-bottom: 1.75rem;
+    }
+    .risk-list {
+      list-style: none;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem 2rem;
+    }
+    @media (max-width: 720px) {
+      .risk-list { grid-template-columns: 1fr; }
+    }
+    .risk-list li {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 1rem;
+      align-items: start;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid var(--hairline);
+    }
+    .risk-list li .num {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.16em;
+      color: var(--gold);
+      padding-top: 0.25rem;
+    }
+    .risk-list li h4 {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 0.35rem;
+      letter-spacing: -0.005em;
+    }
+    .risk-list li p {
+      font-size: 0.875rem;
+      line-height: 1.6;
+      color: var(--ink-soft);
+    }
 
     /* ============================================================
        HOW IT WORKS — sticky scroll-stop sequence
@@ -1320,39 +1466,28 @@
       padding-block: clamp(3rem, 6vw, 4.5rem) 2rem;
       position: relative;
     }
-    .footer-top {
-      display: grid;
-      grid-template-columns: 1.5fr 1fr 1fr;
-      gap: 3rem;
-      padding-bottom: 3rem;
-      border-bottom: 1px solid var(--hairline);
-    }
-    @media (max-width: 800px) {
-      .footer-top { grid-template-columns: 1fr; gap: 2rem; }
-    }
-    .footer-brand { display: flex; flex-direction: column; gap: 1rem; align-items: flex-start; }
-    .footer-tag { color: var(--ink-muted); font-size: 0.9375rem; max-width: 320px; line-height: 1.55; }
-    .footer h4 {
+    .footer-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem 0.75rem;
+      align-items: center;
       font-family: var(--font-mono);
-      font-size: 0.6875rem;
-      font-weight: 500;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
       color: var(--ink-muted);
-      margin-bottom: 1rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--hairline);
+      margin-bottom: 1.75rem;
     }
-    .footer-links { display: flex; flex-direction: column; gap: 0.6rem; font-size: 0.9375rem; }
-    .footer-links a { color: var(--ink-muted); transition: color var(--transition); }
-    .footer-links a:hover { color: var(--ink); }
+    .footer-meta .sep { color: var(--ink-faint); }
     .footer-disclaimer {
-      margin-top: 2rem;
       max-width: 900px;
       font-size: 0.8125rem;
       line-height: 1.7;
       color: var(--ink-muted);
     }
     .footer-copy {
-      margin-top: 2rem;
+      margin-top: 1.75rem;
       font-family: var(--font-mono);
       font-size: 0.75rem;
       color: var(--ink-faint);
@@ -1854,83 +1989,160 @@
       <div class="container">
         <div class="section-head">
           <span class="label">Verified Results</span>
-          <h2>Performance, against benchmarks.</h2>
-          <p class="sub">Real trades, real account, real timestamps. Plotted against Nasdaq and S&amp;P 500 for honest comparison.</p>
+          <h2>Two markets. One disciplined system.</h2>
+          <p class="sub">The system runs a dual-logic architecture across Nasdaq futures and COMEX Gold. Classic ORB serves as the primary entry mechanism; Revised FVG provides backup opportunities when Classic conditions are not met. Both modes use institutional-grade parameters that detect and execute in real time.</p>
         </div>
 
+        <!-- Architecture: two entry paths -->
+        <div class="arch-row">
+          <div class="arch-cell">
+            <span class="label">Primary</span>
+            <h3>Classic ORB</h3>
+            <p>Opening-range breakout. The dominant entry path — taken when the early session structure confirms direction.</p>
+          </div>
+          <div class="arch-cell">
+            <span class="label">Backup</span>
+            <h3>Revised FVG</h3>
+            <p>Fair-value-gap limit entries. Activates when Classic conditions do not trigger, capturing the secondary opportunities the breakout missed.</p>
+          </div>
+        </div>
+
+        <!-- 365-day Gold backtest, headline figures -->
         <div class="results-card">
           <div class="results-headline">
             <div>
-              <div class="results-fig" data-count="47.3" data-suffix="%" data-prefix="+">+0.0%</div>
-              <div class="results-period" style="margin-top:0.55rem;">Year to Date — 2026</div>
+              <div class="results-fig">$10,000 → $41,213</div>
+              <div class="results-period" style="margin-top:0.55rem;">Gold MT5 — 365-day backtest · 2025</div>
             </div>
-            <div class="results-period">Nasdaq YTD <span style="color:var(--ink-soft);">+8.4%</span> &middot; S&amp;P YTD <span style="color:var(--ink-soft);">+5.7%</span></div>
+            <div class="results-period">Forward-tested live since <span style="color:var(--gold);">June 2025</span></div>
           </div>
 
           <div class="results-divider"></div>
 
+          <!-- Representational equity curve based on the 365-day backtest:
+               $10,000 starting equity climbing to $41,213 by year-end with
+               the Q4 deceleration (52.63% win rate) reflected in the late-year
+               flattening. Chart screenshots from the verified broker
+               statement are available on request. -->
           <div class="results-chart-wrap" id="resultsChart">
-            <svg viewBox="0 0 800 320" preserveAspectRatio="none" aria-label="Equity vs benchmarks, year to date">
+            <svg viewBox="0 0 800 320" preserveAspectRatio="none" aria-label="Gold MT5 equity curve, 365-day backtest 2025">
               <line class="grid-line" x1="40" y1="40"  x2="780" y2="40"/>
               <line class="grid-line" x1="40" y1="115" x2="780" y2="115"/>
               <line class="grid-line" x1="40" y1="190" x2="780" y2="190"/>
               <line class="grid-line" x1="40" y1="265" x2="780" y2="265"/>
 
-              <text class="axis-tick" x="6"  y="44">+50%</text>
-              <text class="axis-tick" x="6"  y="119">+33%</text>
-              <text class="axis-tick" x="6"  y="194">+17%</text>
-              <text class="axis-tick" x="6"  y="269">  0%</text>
+              <text class="axis-tick" x="6"  y="44">$40k</text>
+              <text class="axis-tick" x="6"  y="119">$30k</text>
+              <text class="axis-tick" x="6"  y="194">$20k</text>
+              <text class="axis-tick" x="6"  y="269">$10k</text>
 
-              <!-- Nasdaq benchmark (~+8.4% YTD) -->
-              <path class="benchmark-line" d="M40,265 L120,260 L200,253 L280,256 L360,248 L440,242 L520,237 L600,238 L680,233 L754,228"/>
-
-              <!-- Algo line -->
-              <path class="equity-line draw" d="M40,265 L82,256 L124,250 L166,258 L208,242 L250,224 L292,217 L334,206 L376,219 L418,193 L460,180 L502,168 L544,177 L586,148 L628,132 L670,118 L712,103 L754,82"/>
-              <circle class="equity-end" cx="754" cy="82"/>
+              <!-- Equity curve. Steady climb through Q1–Q3, slower Q4
+                   reflecting the documented 52.63% win rate that quarter -->
+              <path class="equity-line draw" d="M40,265 L100,258 L160,248 L220,234 L280,218 L340,196 L400,170 L460,142 L520,114 L580,92 L640,80 L700,72 L754,66"/>
+              <circle class="equity-end" cx="754" cy="66"/>
 
               <text class="axis-tick" x="40"  y="305">JAN</text>
-              <text class="axis-tick" x="220" y="305">FEB</text>
-              <text class="axis-tick" x="400" y="305">MAR</text>
-              <text class="axis-tick" x="580" y="305">APR</text>
-              <text class="axis-tick" x="730" y="305">MAY</text>
+              <text class="axis-tick" x="200" y="305">APR</text>
+              <text class="axis-tick" x="400" y="305">JUL</text>
+              <text class="axis-tick" x="600" y="305">OCT</text>
+              <text class="axis-tick" x="730" y="305">DEC</text>
             </svg>
           </div>
 
           <div class="legend">
-            <span class="item algo"><span class="swatch"></span>Algo by Excelsior</span>
-            <span class="item bench"><span class="swatch"></span>Nasdaq Composite</span>
+            <span class="item algo"><span class="swatch"></span>Gold MT5 — Elite tier</span>
           </div>
 
           <div class="results-stat-row">
-            <div class="results-stat"><div class="lab">Win Rate</div><div class="val" data-count="78" data-suffix="%">0%</div></div>
-            <div class="results-stat"><div class="lab">Total Trades</div><div class="val" data-count="1482" data-comma="1">0</div></div>
-            <div class="results-stat"><div class="lab">Avg. Hold</div><div class="val" data-count="4.2" data-suffix="h">0h</div></div>
-            <div class="results-stat"><div class="lab">Max Drawdown</div><div class="val" data-count="6.1" data-suffix="%">0%</div></div>
+            <div class="results-stat"><div class="lab">Win Rate</div><div class="val">73.47%</div></div>
+            <div class="results-stat"><div class="lab">Profit Factor</div><div class="val">3.59</div></div>
+            <div class="results-stat"><div class="lab">Max Drawdown</div><div class="val">12.02%</div></div>
+            <div class="results-stat"><div class="lab">Annual Return</div><div class="val">+312%</div></div>
+          </div>
+
+          <p class="results-note">Q4 2025 specifically demonstrated a lower win rate of 52.63%, showing that performance varies across periods. Backtest commission $1.80 / round-trip; slippage 2 ticks. Verified broker statements available on the discovery call.</p>
+        </div>
+
+        <!-- Configurations — recommended use cases -->
+        <div class="config-block">
+          <span class="label">Configurations</span>
+          <h3>Compatible across account types.</h3>
+          <p class="config-sub">Recommended parameters vary by use case. All configurations remain compatible with the system; risk parameters are tuned to the account profile.</p>
+          <div class="config-grid">
+            <div class="config-item">
+              <span class="config-tag">Prop firm</span>
+              <p>Drawdown-aware sizing for $50k–$300k funded accounts. Adheres to firm-specific equity and daily-loss limits.</p>
+            </div>
+            <div class="config-item">
+              <span class="config-tag">Personal growth</span>
+              <p>Variable equity-percent risk to compound systematically over time. Suits long-horizon retail accounts.</p>
+            </div>
+            <div class="config-item">
+              <span class="config-tag">New users</span>
+              <p>Conservative defaults from day one. Built around the documented learning curve of a 30+ parameter system.</p>
+            </div>
+            <div class="config-item">
+              <span class="config-tag">Multi-account</span>
+              <p>The same strategy mirrored across multiple accounts simultaneously, with per-account isolation on risk.</p>
+            </div>
+            <div class="config-item">
+              <span class="config-tag">High volatility</span>
+              <p>Adjusted sizing and wider stop multiples for trending or news-driven regimes such as FOMC and NFP.</p>
+            </div>
           </div>
         </div>
 
-        <div class="trades-wrap" id="tradesWrap">
-        <table class="trades" aria-label="Recent trades">
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Instrument</th>
-              <th>Entry</th>
-              <th>Exit</th>
-              <th class="r">P / L</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td class="muted">2026-04-29</td><td>NQ</td><td>18,247.50</td><td>18,392.10</td><td class="r pos">+0.79%</td></tr>
-            <tr><td class="muted">2026-04-28</td><td>XAU/USD</td><td>2,341.20</td><td>2,338.85</td><td class="r neg">−0.10%</td></tr>
-            <tr><td class="muted">2026-04-27</td><td>NQ</td><td>18,105.00</td><td>18,234.80</td><td class="r pos">+0.72%</td></tr>
-            <tr><td class="muted">2026-04-26</td><td>XAU/USD</td><td>2,355.40</td><td>2,371.90</td><td class="r pos">+0.70%</td></tr>
-            <tr><td class="muted">2026-04-25</td><td>NQ</td><td>18,420.00</td><td>18,365.50</td><td class="r neg">−0.30%</td></tr>
-          </tbody>
-        </table>
+        <!-- Risk considerations — verbatim from the brief, structured -->
+        <div class="risk-block">
+          <span class="label">Risk Considerations</span>
+          <h3>Honest about what could go wrong.</h3>
+          <ul class="risk-list">
+            <li>
+              <span class="num">01</span>
+              <div>
+                <h4>Past performance</h4>
+                <p>Backtested and forward-tested results do not guarantee future performance. Market conditions evolve and may differ from the testing period.</p>
+              </div>
+            </li>
+            <li>
+              <span class="num">02</span>
+              <div>
+                <h4>Drawdown tolerance</h4>
+                <p>With 2% equity risk on NQ, consecutive losing trades can produce temporary drawdowns. Conservative caps this at roughly 28% maximum; Moderate can reach approximately 42%.</p>
+              </div>
+            </li>
+            <li>
+              <span class="num">03</span>
+              <div>
+                <h4>Execution variance</h4>
+                <p>Live execution may experience different slippage and fill quality than backtested assumptions ($1.80 commission, 2-point slippage).</p>
+              </div>
+            </li>
+            <li>
+              <span class="num">04</span>
+              <div>
+                <h4>System complexity</h4>
+                <p>The dual-logic architecture has 30+ configurable parameters and requires an initial learning investment. Safe-setup defaults are recommended for new users.</p>
+              </div>
+            </li>
+            <li>
+              <span class="num">05</span>
+              <div>
+                <h4>Market dependency</h4>
+                <p>Optimised for NQ / MNQ futures during the New York session and for COMEX Gold via MT5. Performance on other instruments or sessions may vary.</p>
+              </div>
+            </li>
+            <li>
+              <span class="num">06</span>
+              <div>
+                <h4>Configuration selection</h4>
+                <p>Switching between Conservative and Moderate mid-period can disrupt position-sizing continuity. Commit to one configuration per account.</p>
+              </div>
+            </li>
+          </ul>
         </div>
 
-        <p class="results-disclaimer">Past performance does not guarantee future results. All trading carries risk of capital loss. Results shown are from a live verified account.</p>
+        <p class="results-disclaimer">Past performance does not guarantee future results. Forward-tested on live funded accounts since June 2025; live execution may vary due to slippage, market conditions, and broker specifics. Maximum intrabar drawdown of 12.02% is manageable but requires disciplined risk tolerance. The system uses variable equity-percent risk — position sizes grow with account equity. All trading involves risk of capital loss.</p>
       </div>
     </section>
 
@@ -1940,22 +2152,27 @@
     <section class="section section-enter" id="spec">
       <div class="container">
         <div class="section-head">
-          <span class="label">Risk Profile</span>
+          <span class="label">System Spec</span>
           <h2>The exact spec, on the surface.</h2>
-          <p class="sub">No hidden parameters. Every limit, instrument, session, and integration the system uses, in plain text.</p>
+          <p class="sub">Every limit, instrument, session, and integration the system uses, published in plain text. No hidden parameters.</p>
         </div>
 
         <div class="spec-grid split" role="list">
-          <div class="spec-row" role="listitem"><span class="k">Max drawdown limit</span><span class="v">6.5%</span></div>
-          <div class="spec-row" role="listitem"><span class="k">Risk per trade</span><span class="v">≤ 1.0%</span></div>
-          <div class="spec-row" role="listitem"><span class="k">Max open positions</span><span class="v">2</span></div>
+          <div class="spec-row" role="listitem"><span class="k">Architecture</span><span class="v">Classic ORB + Revised FVG (dual-logic)</span></div>
+          <div class="spec-row" role="listitem"><span class="k">Configurable parameters</span><span class="v">30+</span></div>
+          <div class="spec-row" role="listitem"><span class="k">Instruments</span><span class="v">NQ / MNQ futures · COMEX Gold (MT5)</span></div>
+          <div class="spec-row" role="listitem"><span class="k">Primary session</span><span class="v">New York</span></div>
           <div class="spec-row" role="listitem"><span class="k">Stop loss</span><span class="v">Hard, pre-trade</span></div>
-          <div class="spec-row" role="listitem"><span class="k">Instruments</span><span class="v">NQ futures · XAU/USD spot</span></div>
-          <div class="spec-row" role="listitem"><span class="k">Median hold time</span><span class="v">4.2 h</span></div>
-          <div class="spec-row" role="listitem"><span class="k">Sessions</span><span class="v">London &amp; New York</span></div>
-          <div class="spec-row" role="listitem"><span class="k">Broker integration</span><span class="v">TradingView webhook</span></div>
-          <div class="spec-row" role="listitem"><span class="k">Operational uptime (LTD)</span><span class="v pos">99.92%</span></div>
-          <div class="spec-row" role="listitem"><span class="k">Live since</span><span class="v">March 2023</span></div>
+          <div class="spec-row" role="listitem"><span class="k">Risk per trade (Conservative)</span><span class="v">2% equity (NQ)</span></div>
+          <div class="spec-row" role="listitem"><span class="k">Max drawdown — Conservative</span><span class="v">≈ 28%</span></div>
+          <div class="spec-row" role="listitem"><span class="k">Max drawdown — Moderate</span><span class="v">≈ 42%</span></div>
+          <div class="spec-row" role="listitem"><span class="k">Backtest max DD (Gold, 2025)</span><span class="v pos">12.02%</span></div>
+          <div class="spec-row" role="listitem"><span class="k">Backtest win rate (Gold, 2025)</span><span class="v pos">73.47%</span></div>
+          <div class="spec-row" role="listitem"><span class="k">Backtest profit factor</span><span class="v pos">3.59</span></div>
+          <div class="spec-row" role="listitem"><span class="k">Commission assumption</span><span class="v">$1.80 / round-trip</span></div>
+          <div class="spec-row" role="listitem"><span class="k">Slippage assumption</span><span class="v">2 ticks</span></div>
+          <div class="spec-row" role="listitem"><span class="k">Execution</span><span class="v">TradingView webhook · MT5 native</span></div>
+          <div class="spec-row" role="listitem"><span class="k">Forward-tested live since</span><span class="v">June 2025</span></div>
         </div>
       </div>
     </section>
@@ -1967,29 +2184,31 @@
       <div class="container">
         <div class="section-head" style="text-align:center; margin-inline:auto;">
           <span class="label" style="justify-content:center; display:inline-flex;">Pricing</span>
-          <h2>Two ways to get started.</h2>
-          <p class="sub" style="margin-inline:auto;">After purchase, you'll be sent a link to book your 1-on-1 onboarding call within 24 hours.</p>
+          <h2>Buy the bots. Run them yourself, or let us run them.</h2>
+          <p class="sub" style="margin-inline:auto;">Two parts. Buy the bot once, then optionally subscribe to cloud automation per account. Every purchase begins with a 1-on-1 discovery call.</p>
         </div>
 
         <div class="pricing-grid">
+          <!-- ========= BOTS — one-time purchase ========= -->
           <article class="price-card">
-            <div class="plan-name">Subscription</div>
-            <div class="plan-price" id="priceSubscription">£1,000<span class="unit">/month</span></div>
-            <div class="plan-price-note">Cancel anytime · No setup fee</div>
-            <ul class="plan-features">
-              <li><svg class="check" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 11 L8 15 L16 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Fully automated Nasdaq and Gold execution</li>
-              <li><svg class="check" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 11 L8 15 L16 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>TradingView integration included</li>
-              <li><svg class="check" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 11 L8 15 L16 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Predefined risk management (stop loss + take profit)</li>
-              <li><svg class="check" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 11 L8 15 L16 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Weekly performance reports</li>
-              <li><svg class="check" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 11 L8 15 L16 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>1-on-1 Zoom onboarding call</li>
-              <li><svg class="check" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 11 L8 15 L16 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Private community group access</li>
-            </ul>
-            <a href="#" class="btn btn-primary plan-card-cta" id="checkoutSubscription">Get Started →</a>
-            <p class="plan-help">Includes 1-on-1 onboarding · £12,000 per year</p>
+            <div class="plan-name">Trading Bots</div>
+            <div class="plan-price">From £2,000<span class="unit"> · one-time</span></div>
+            <div class="plan-price-note">Pay once · Own the bot · Includes onboarding</div>
 
-            <!-- Buyer details form. Reveals when Get Started is
-                 clicked; on submit, redirects to the Stripe URL
-                 with prefilled_email + client_reference_id. -->
+            <ul class="plan-features">
+              <li><svg class="check" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 11 L8 15 L16 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><strong>Gold MT5 — £2,000</strong> · The Elite-tier core. COMEX Gold, dual-logic architecture, free TradingView indicator included.</li>
+              <li><svg class="check" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 11 L8 15 L16 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><strong>FX module — +£500</strong> · Add the foreign-exchange engine to the same architecture.</li>
+              <li><svg class="check" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 11 L8 15 L16 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><strong>Crypto module — +£1,000</strong> · The compounding-growth engine. Recommended once profits from Gold or FX have established a base.</li>
+              <li><svg class="check" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 11 L8 15 L16 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Lifetime access · 1-on-1 Zoom onboarding · Full strategy code</li>
+              <li><svg class="check" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 11 L8 15 L16 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Hard pre-trade stop losses · 30+ configurable parameters · Conservative defaults</li>
+            </ul>
+
+            <a href="#" class="btn btn-primary plan-card-cta" id="checkoutSubscription" data-interest="bots">Discuss the bots →</a>
+            <p class="plan-help">Pricing and final config are discussed on the discovery call.</p>
+
+            <!-- Lead-capture form. Reveals on click. Submits to the
+                 admin /api/leads endpoint with the buyer's interest,
+                 then redirects to the Calendly discovery-call URL. -->
             <form class="checkout-form" id="subscriptionForm" novalidate>
               <div class="form-row">
                 <label class="form-label" for="cf-name">Full name</label>
@@ -2025,26 +2244,28 @@
             </form>
           </article>
 
+          <!-- ========= AUTOMATION — monthly per account ========= -->
           <article class="price-card">
-            <div class="plan-name">Lifetime</div>
-            <div class="plan-price" id="priceLifetime">POA<span class="unit"> on application</span></div>
-            <div class="plan-price-note">Pay once · Own the system · Pricing on the call</div>
+            <div class="plan-name">Cloud Automation</div>
+            <div class="plan-price">£150<span class="unit"> /account · per month</span></div>
+            <div class="plan-price-note">We run the bot · You keep your credentials</div>
+
             <ul class="plan-features">
-              <li><svg class="check" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 11 L8 15 L16 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Everything in Subscription</li>
-              <li><svg class="check" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 11 L8 15 L16 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Own the system outright</li>
-              <li><svg class="check" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 11 L8 15 L16 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Full TradingView strategy code</li>
-              <li><svg class="check" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 11 L8 15 L16 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Lifetime updates</li>
-              <li><svg class="check" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 11 L8 15 L16 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Priority support</li>
-              <li><svg class="check" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 11 L8 15 L16 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Annual strategy review</li>
+              <li><svg class="check" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 11 L8 15 L16 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Strategy executed on our cloud — single account connection per subscription.</li>
+              <li><svg class="check" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 11 L8 15 L16 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Compatible with prop-funded accounts in the $50k–$300k range.</li>
+              <li><svg class="check" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 11 L8 15 L16 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Compatible with live cash accounts at your existing broker.</li>
+              <li><svg class="check" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 11 L8 15 L16 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>You retain credentials — we attach the strategy; trades mirror across the account you nominate.</li>
+              <li><svg class="check" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 11 L8 15 L16 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Add additional accounts at <strong>£150 each</strong> — same strategy, separate execution.</li>
             </ul>
-            <a href="#" class="btn btn-ghost plan-card-cta" id="enquireLifetime">Enquire →</a>
-            <p class="plan-help">Includes 1-on-1 onboarding · Pricing discussed on the call</p>
+
+            <a href="#" class="btn btn-ghost plan-card-cta" id="enquireLifetime" data-interest="automation">Discuss automation →</a>
+            <p class="plan-help">Subscription and account-onboarding details discussed on the call.</p>
           </article>
         </div>
 
-        <p class="pricing-help">Prefer to chat first? <a href="#cta">Book a free 15-minute discovery call →</a></p>
+        <p class="pricing-help">Want to chat through the right combination? <a href="#cta">Book a free 15-minute discovery call →</a></p>
 
-        <p class="pricing-disclaimer">By purchasing, you agree to the Terms of Service and Risk Disclaimer. Algo by Excelsior provides automated trading software, not regulated investment advice. Trading carries risk of capital loss.</p>
+        <p class="pricing-disclaimer">Algo by Excelsior provides automated trading software and optional execution services — not regulated investment advice. Trading carries risk of capital loss. Quoted prices are indicative; final terms are confirmed on the discovery call.</p>
       </div>
     </section>
 
@@ -2158,36 +2379,13 @@
        ========================================================= -->
   <footer class="footer">
     <div class="container">
-
-      <div class="footer-top">
-        <div class="footer-brand">
-          <img class="lockup-img lockup-footer" src="logo/algo-logo.png" alt="Algo by Excelsior" width="540" height="360">
-          <p class="footer-tag">Automated trading. Engineered for serious investors.</p>
-        </div>
-
-        <div>
-          <h4>Site</h4>
-          <ul class="footer-links">
-            <li><a href="#how">How It Works</a></li>
-            <li><a href="#results">Results</a></li>
-            <li><a href="#spec">Spec</a></li>
-            <li><a href="#faq">FAQ</a></li>
-            <li><a href="#trust">About</a></li>
-            <li><a href="#cta">Contact</a></li>
-          </ul>
-        </div>
-
-        <div>
-          <h4>Legal</h4>
-          <ul class="footer-links">
-            <li><a href="#">Terms of Service</a></li>
-            <li><a href="#">Privacy Policy</a></li>
-            <li><a href="#">Risk Disclaimer</a></li>
-          </ul>
-        </div>
+      <div class="footer-meta">
+        <span>Algo by Excelsior · Glasgow, UK</span>
+        <span class="sep" aria-hidden="true">·</span>
+        <span>Not authorised or regulated by the Financial Conduct Authority</span>
       </div>
 
-      <p class="footer-disclaimer">Algo by Excelsior provides automated trading software. Trading financial instruments carries a high level of risk and may not be suitable for all investors. Past performance is not indicative of future results. You should carefully consider your investment objectives, level of experience, and risk appetite before using this service. The value of investments can go down as well as up, and you may lose some or all of your invested capital. This website does not constitute financial advice. Algo by Excelsior is not authorised or regulated by the Financial Conduct Authority.</p>
+      <p class="footer-disclaimer">Algo by Excelsior provides automated trading software and optional execution services. Trading financial instruments carries a high level of risk and may not be suitable for all investors. Past performance, including backtested and forward-tested results, is not indicative of future results. The value of investments can go down as well as up, and you may lose some or all of your invested capital. Nothing on this website constitutes financial advice. If you require advice on whether algorithmic trading is suitable for you, consult an FCA-authorised financial adviser before booking.</p>
 
       <p class="footer-copy">© 2026 Excelsior. All rights reserved.</p>
     </div>
@@ -2200,13 +2398,9 @@
     const CALENDLY_URL      = '';
     const WHATSAPP_NUMBER   = '';
     const WHATSAPP_DISPLAY  = '';
-    // Checkout URL for the Subscription tier — drop in your Stripe
-    // Checkout (or other provider) URL. Configure the success_url
-    // on the checkout session to redirect to your Calendly onboarding
-    // link so the buyer is sent straight to booking after payment.
-    // The Lifetime tier is POA — its button routes to CALENDLY_URL
-    // (the discovery call) so pricing is discussed live.
-    const CHECKOUT_SUBSCRIPTION_URL = '';
+    // (Stripe checkout removed in this revision — current pricing model
+    // routes both pricing CTAs through the discovery call. The bot price
+    // is closed on the call; cloud automation is set up afterwards.)
 
     // Admin portal lead intake. The marketing-site form fires a
     // fire-and-forget POST here before redirecting to Stripe, so
@@ -2234,12 +2428,12 @@
       }
 
       // Subscription checkout flow:
-      //   1. Click Get Started → reveal the form inside the card
+      //   1. Click "Discuss the bots" → reveal the form inside the card
       //   2. Fill name / email / phone / risk-acknowledge
-      //   3. Click Next → if CHECKOUT_SUBSCRIPTION_URL is set,
-      //      redirect to Stripe with prefilled_email +
-      //      client_reference_id appended; otherwise show an
-      //      inline "checkout pending" message.
+      //   3. Click Next → POST the lead to the admin (with the
+      //      data-interest tag from the button), then redirect to
+      //      CALENDLY_URL so the buyer books the discovery call.
+      //      The actual sale closes on that call.
       const subBtn  = document.getElementById('checkoutSubscription');
       const subForm = document.getElementById('subscriptionForm');
       const subCard = subBtn ? subBtn.closest('.price-card') : null;
@@ -2311,6 +2505,7 @@
                 ...data,
                 risk_ack: !!data.risk_ack,
                 client_reference_id: clientRefId,
+                interest: subBtn.dataset.interest || 'bots',
                 source: 'marketing-site',
                 referrer: document.referrer || '',
                 utm_source: params.get('utm_source') || '',
@@ -2332,32 +2527,21 @@
             }
           }
 
-          if (!CHECKOUT_SUBSCRIPTION_URL) {
+          // Redirect to the discovery-call booking page (the bot price
+          // and configuration are confirmed on the call). If Calendly
+          // isn't configured yet, show an inline note so the form
+          // submission isn't lost.
+          if (!CALENDLY_URL) {
             if (subErr) {
-              subErr.textContent = 'Checkout is currently pending. Your details have been saved — please book a discovery call instead.';
+              subErr.textContent = 'Thanks — your details have been saved. The booking link will be emailed to you shortly.';
             }
             return;
           }
-
-          // Build Stripe URL with prefilled email +
-          // client_reference_id for the webhook to match against
-          // the same value already POSTed to the admin API.
-          let target = CHECKOUT_SUBSCRIPTION_URL;
-          try {
-            const url = new URL(CHECKOUT_SUBSCRIPTION_URL);
-            if (data.email) url.searchParams.set('prefilled_email', String(data.email));
-            url.searchParams.set('client_reference_id', clientRefId);
-            target = url.toString();
-          } catch (_) { /* invalid URL — fall through to raw value */ }
-
-          // Redirect in same tab so Stripe controls the flow
-          // from here. The buyer can use back-button to return.
-          window.location.href = target;
+          window.location.href = CALENDLY_URL;
         });
       }
 
-      // Lifetime is POA — the button routes to the discovery call
-      // (CALENDLY_URL) where pricing is discussed live.
+      // Cloud Automation card — also routes to the discovery call.
       const enquireBtn = document.getElementById('enquireLifetime');
       if (enquireBtn) {
         if (CALENDLY_URL) {
