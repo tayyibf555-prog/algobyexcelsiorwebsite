@@ -1596,6 +1596,31 @@
     }
     .plan-features li:last-child { border-bottom: 0; }
     .check { flex-shrink: 0; width: 16px; height: 16px; margin-top: 3px; color: var(--positive); }
+
+    /* Bare-list variant — no ticks. Price-list rows: key on the left,
+       optional value (the price or +£amount) on the right. */
+    .plan-features.bare li {
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 1rem;
+      font-size: 0.9375rem;
+      color: var(--ink);
+    }
+    .plan-features.bare li.indent {
+      padding-top: 0;
+      border-top: 0;
+      color: var(--ink-muted);
+      font-size: 0.8125rem;
+    }
+    .plan-features.bare .line-k { flex: 1; line-height: 1.5; }
+    .plan-features.bare .line-v {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      color: var(--gold);
+      letter-spacing: -0.005em;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
     .plan-card-cta { width: 100%; }
     .plan-help {
       margin-top: 1rem;
@@ -2211,22 +2236,24 @@
         </div>
 
         <div class="pricing-grid">
-          <!-- ========= BOTS — one-time purchase ========= -->
+          <!-- ========= BOTS — one-time purchase =========
+               Strictly client-stated content. Three priced products,
+               nothing fabricated. The TradingView-indicator note is
+               the one verbatim "added bonus" line from the email. -->
           <article class="price-card">
             <div class="plan-name">Trading Bots</div>
-            <div class="plan-price">From £2,000<span class="unit"> · one-time</span></div>
-            <div class="plan-price-note">Pay once · Own the bot · Includes onboarding</div>
+            <div class="plan-price">From £2,000</div>
+            <div class="plan-price-note">One-time · Per bot</div>
 
-            <ul class="plan-features">
-              <li><svg class="check" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 11 L8 15 L16 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><strong>Gold MT5 — £2,000</strong> · The Elite-tier core. COMEX Gold, dual-logic architecture, free TradingView indicator included.</li>
-              <li><svg class="check" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 11 L8 15 L16 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><strong>FX module — +£500</strong> · Add the foreign-exchange engine to the same architecture.</li>
-              <li><svg class="check" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 11 L8 15 L16 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><strong>Crypto module — +£1,000</strong> · The compounding-growth engine. Recommended once profits from Gold or FX have established a base.</li>
-              <li><svg class="check" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 11 L8 15 L16 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Lifetime access · 1-on-1 Zoom onboarding · Full strategy code</li>
-              <li><svg class="check" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 11 L8 15 L16 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Hard pre-trade stop losses · 30+ configurable parameters · Conservative defaults</li>
+            <ul class="plan-features bare">
+              <li><span class="line-k">Gold MT5 bot</span><span class="line-v">£2,000</span></li>
+              <li class="indent"><span class="line-k">TradingView indicator included as added bonus</span></li>
+              <li><span class="line-k">FX bot</span><span class="line-v">+£500</span></li>
+              <li><span class="line-k">Crypto bot</span><span class="line-v">+£1,000</span></li>
             </ul>
 
             <a href="#" class="btn btn-primary plan-card-cta" id="checkoutSubscription" data-interest="bots">Discuss the bots →</a>
-            <p class="plan-help">Pricing and final config are discussed on the discovery call.</p>
+            <p class="plan-help">Final configuration discussed on the discovery call.</p>
 
             <!-- Lead-capture form. Reveals on click. Submits to the
                  admin /api/leads endpoint with the buyer's interest,
@@ -2266,22 +2293,24 @@
             </form>
           </article>
 
-          <!-- ========= AUTOMATION — monthly per account ========= -->
+          <!-- ========= AUTOMATION — per-account subscription =========
+               All five lines are paraphrased from the client's email
+               verbatim, in the order they appear in the brief. -->
           <article class="price-card">
             <div class="plan-name">Cloud Automation</div>
             <div class="plan-price">£150<span class="unit"> per account</span></div>
-            <div class="plan-price-note">Subscription service · We run the bot · You keep your credentials</div>
+            <div class="plan-price-note">Subscription service</div>
 
-            <ul class="plan-features">
-              <li><svg class="check" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 11 L8 15 L16 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Strategy executed on our cloud — single account connection per subscription.</li>
-              <li><svg class="check" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 11 L8 15 L16 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Compatible with prop-funded accounts in the $50k–$300k range.</li>
-              <li><svg class="check" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 11 L8 15 L16 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Compatible with live cash accounts at your existing broker.</li>
-              <li><svg class="check" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 11 L8 15 L16 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>You retain credentials — we attach the strategy; trades mirror across the account you nominate.</li>
-              <li><svg class="check" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 11 L8 15 L16 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Add additional accounts at <strong>£150 each</strong> — same strategy, separate execution.</li>
+            <ul class="plan-features bare">
+              <li><span class="line-k">Single-account connection automated on our cloud</span></li>
+              <li><span class="line-k">For management of $50k–$300k prop-funded accounts</span></li>
+              <li><span class="line-k">Same applies to live cash accounts at your existing broker</span></li>
+              <li><span class="line-k">Clients retain credentials; we attach the strategy and trades mirror across</span></li>
+              <li><span class="line-k">Additional accounts</span><span class="line-v">£150 each</span></li>
             </ul>
 
             <a href="#" class="btn btn-ghost plan-card-cta" id="enquireLifetime" data-interest="automation">Discuss automation →</a>
-            <p class="plan-help">Subscription terms and account-onboarding details discussed on the call.</p>
+            <p class="plan-help">Subscription terms confirmed on the discovery call.</p>
           </article>
         </div>
 
