@@ -1056,121 +1056,116 @@
        top and cycles through three step-states as the user scrolls.
        Mobile collapses to a normal stacked flow.
        ============================================================ */
-    .how-sticky {
-      position: relative;
-      height: 320vh; /* 3 steps × ~107vh each */
-      padding: 0;
-    }
-    .how-pin {
-      position: sticky;
-      top: 0;
-      height: 100vh;
-      min-height: 640px;
+    /* HOW IT WORKS — swipeable card carousel */
+    .how-section { padding-block: clamp(4rem, 9vw, 7rem); }
+
+    .how-shell {
       display: flex;
       align-items: center;
-      overflow: hidden;
-    }
-    .how-frame {
-      width: 100%;
-      max-width: var(--container-w);
-      margin: 0 auto;
-      padding-inline: var(--container-pad);
-      padding-block: clamp(7rem, 14vh, 10rem) clamp(3rem, 6vw, 5rem);
-      display: flex;
-      flex-direction: column;
-      gap: clamp(1.5rem, 3vw, 2.5rem);
-      height: 100%;
-    }
-    .how-meta {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-    .how-progress {
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      font-family: var(--font-mono);
-      font-size: 0.6875rem;
-      letter-spacing: 0.18em;
-      color: var(--ink-faint);
-      text-transform: uppercase;
-    }
-    .how-progress .dots {
-      display: inline-flex;
-      gap: 0.4rem;
-      align-items: center;
-    }
-    .how-progress .dot {
-      width: 22px;
-      height: 2px;
-      background: var(--hairline);
-      transition: background 280ms ease-out;
-    }
-    .how-progress .dot.active { background: var(--gold); }
-    .how-progress .counter {
-      color: var(--ink-soft);
-      letter-spacing: 0.2em;
-      min-width: 4.4em;
-      text-align: right;
-      font-variant-numeric: tabular-nums;
+      gap: 0.75rem;
+      margin-top: 2rem;
     }
 
-    .how-stage {
-      flex: 1;
-      position: relative;
-      min-height: 0;
+    .how-arrow {
+      flex-shrink: 0;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid var(--hairline);
+      background: rgba(0, 0, 0, 0.4);
+      color: var(--ink-soft);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition);
     }
-    .how-pane {
-      position: absolute;
-      inset: 0;
+    .how-arrow:hover:not(:disabled) {
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+    .how-arrow:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+    .how-arrow svg { width: 18px; height: 18px; }
+
+    /* Hide arrows on touch — natural swipe replaces them */
+    @media (max-width: 720px) {
+      .how-arrow { display: none; }
+    }
+
+    .how-rail {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      gap: 1rem;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      padding: 0.5rem 0.25rem;
+      outline: none;
+    }
+    .how-rail::-webkit-scrollbar { display: none; }
+    .how-rail:focus-visible {
+      box-shadow: 0 0 0 1px var(--hairline-gold);
+      border-radius: 16px;
+    }
+
+    .how-card {
+      flex: 0 0 100%;
+      scroll-snap-align: center;
+      scroll-snap-stop: always;
+      border: 1px solid var(--hairline);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.012);
+      padding: clamp(1.75rem, 4vw, 3rem);
+      transition: border-color var(--transition);
+    }
+    .how-card:hover { border-color: var(--hairline-hi); }
+
+    .how-card-inner {
       display: grid;
       grid-template-columns: 5fr 6fr;
-      gap: clamp(2rem, 5vw, 4rem);
+      gap: clamp(2rem, 4vw, 3.5rem);
       align-items: center;
-      opacity: 0;
-      transform: translateY(28px);
-      pointer-events: none;
-      transition: opacity 520ms cubic-bezier(0.2, 0.7, 0.2, 1), transform 520ms cubic-bezier(0.2, 0.7, 0.2, 1);
     }
-    .how-pane.active {
-      opacity: 1;
-      transform: none;
-      pointer-events: auto;
+    @media (max-width: 900px) {
+      .how-card-inner { grid-template-columns: 1fr; gap: 1.5rem; }
     }
-    .how-pane .text {
-      max-width: 480px;
-    }
-    .how-pane .big-marker {
+
+    .how-card-text { max-width: 480px; }
+
+    .how-card .big-marker {
       font-family: var(--font-display);
-      font-size: clamp(5rem, 11vw, 11rem);
+      font-size: clamp(4rem, 9vw, 8rem);
       font-weight: 800;
       line-height: 0.85;
       letter-spacing: -0.06em;
       color: var(--ink-faint);
       font-variant-numeric: tabular-nums;
       display: block;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.25rem;
       -webkit-text-stroke: 1px rgba(245, 239, 227, 0.18);
       text-stroke: 1px rgba(245, 239, 227, 0.18);
     }
-    .how-pane h2 {
-      font-size: clamp(1.875rem, 3.4vw, 2.75rem);
+    .how-card h2 {
+      font-size: clamp(1.625rem, 3vw, 2.25rem);
       font-weight: 600;
       letter-spacing: -0.025em;
-      line-height: 1.05;
+      line-height: 1.1;
       color: var(--ink);
-      margin-bottom: 1.1rem;
+      margin-bottom: 1rem;
     }
-    .how-pane p {
+    .how-card p {
       color: var(--ink-soft);
-      font-size: 1.0625rem;
+      font-size: 1rem;
       line-height: 1.6;
-      margin-bottom: 1.25rem;
+      margin-bottom: 1.15rem;
     }
-    .how-pane .meta {
+    .how-card .meta {
       font-family: var(--font-mono);
       font-size: 0.6875rem;
       letter-spacing: 0.18em;
@@ -1182,8 +1177,8 @@
       border-radius: 999px;
     }
 
-    /* Stylised "screens" inside each pane */
-    .how-pane .screen {
+    /* Stylised "screens" inside each card — same look as before */
+    .how-card .screen {
       border: 1px solid var(--hairline);
       border-radius: 14px;
       overflow: hidden;
@@ -1192,7 +1187,7 @@
       max-width: 540px;
       box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 24px 64px rgba(0, 0, 0, 0.5);
     }
-    .how-pane .screen .bar {
+    .how-card .screen .bar {
       display: flex;
       align-items: center;
       gap: 0.4rem;
@@ -1200,12 +1195,12 @@
       border-bottom: 1px solid var(--hairline);
       background: rgba(0, 0, 0, 0.5);
     }
-    .how-pane .screen .bar .dot {
+    .how-card .screen .bar .dot {
       width: 8px; height: 8px;
       border-radius: 50%;
       background: rgba(255, 255, 255, 0.18);
     }
-    .how-pane .screen .bar .title {
+    .how-card .screen .bar .title {
       margin-left: 0.55rem;
       font-family: var(--font-mono);
       font-size: 0.6875rem;
@@ -1213,75 +1208,61 @@
       text-transform: uppercase;
       color: var(--ink-muted);
     }
-    .how-pane .screen-body {
+    .how-card .screen-body {
       padding: 1.25rem 1.4rem;
       font-family: var(--font-mono);
       font-size: 0.8125rem;
       line-height: 1.8;
       color: var(--ink-muted);
     }
-    .how-pane .screen-body .row { display: flex; justify-content: space-between; gap: 0.5rem; }
-    .how-pane .screen-body .row .v { color: var(--ink); }
-    .how-pane .screen-body .row .v.pos { color: var(--positive); }
-    .how-pane .screen-body .ln { color: var(--gold); }
-    .how-pane .screen-svg { display: block; width: 100%; height: 140px; }
-    .how-pane .screen-svg .gline { stroke: rgba(255,255,255,0.05); stroke-width: 1; }
-    .how-pane .screen-svg .equity { fill: none; stroke: var(--gold); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+    .how-card .screen-body .row { display: flex; justify-content: space-between; gap: 0.5rem; }
+    .how-card .screen-body .row .v { color: var(--ink); }
+    .how-card .screen-body .row .v.pos { color: var(--positive); }
+    .how-card .screen-body .ln { color: var(--gold); }
+    .how-card .screen-svg { display: block; width: 100%; height: 140px; }
+    .how-card .screen-svg .gline { stroke: rgba(255,255,255,0.05); stroke-width: 1; }
+    .how-card .screen-svg .equity { fill: none; stroke: var(--gold); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
 
-    /* Bottom progress bar — fills as user scrolls through 3 steps */
-    .how-progress-bar {
-      position: relative;
-      height: 1px;
+    /* Pagination — dots + counter, centered below the rail */
+    .how-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-top: 1.75rem;
+    }
+    .how-dots {
+      display: inline-flex;
+      gap: 0.4rem;
+      align-items: center;
+    }
+    .how-dot {
+      width: 28px;
+      height: 3px;
       background: var(--hairline);
-      width: 100%;
-      overflow: hidden;
+      border: 0;
+      padding: 0;
+      cursor: pointer;
+      transition: background 280ms ease-out;
     }
-    .how-progress-bar::before {
-      content: '';
-      position: absolute;
-      top: -1px; bottom: -1px;
-      left: 0;
-      right: 0;
-      transform-origin: left center;
-      transform: scaleX(var(--how-progress, 0));
-      background: linear-gradient(90deg, var(--gold-deep), var(--gold));
-      transition: transform 80ms linear;
-      box-shadow: 0 0 8px var(--gold);
-      will-change: transform;
+    .how-dot:hover:not(.active) { background: rgba(245, 239, 227, 0.25); }
+    .how-dot.active { background: var(--gold); }
+    .how-counter {
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      letter-spacing: 0.18em;
+      color: var(--ink-soft);
+      font-variant-numeric: tabular-nums;
+      min-width: 4.5em;
+      text-align: center;
     }
 
-    /* Mobile fallback: don't pin, show steps stacked normally */
-    @media (max-width: 900px) {
-      .how-sticky { height: auto; }
-      .how-pin { position: static; height: auto; min-height: 0; display: block; }
-      .how-frame { padding-block: clamp(4rem, 10vw, 6rem); gap: 1.75rem; height: auto; }
-      .how-stage {
-        position: static;
-        display: flex;
-        flex-direction: column;
-        gap: clamp(2.5rem, 7vw, 4rem);
-      }
-      .how-pane {
-        position: static;
-        opacity: 1;
-        transform: none;
-        pointer-events: auto;
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
-      }
-      .how-pane .big-marker {
-        font-size: clamp(3.5rem, 14vw, 5.5rem);
-        margin-bottom: 0.75rem;
-      }
-      .how-pane h2 { font-size: clamp(1.5rem, 5.5vw, 2.25rem); }
-      .how-pane p { font-size: 1rem; }
-      .how-pane .screen { max-width: 100%; }
-      .how-progress-bar { display: none; }
-      .how-progress .counter { display: none; }
-    }
     @media (max-width: 480px) {
-      .how-pane .screen-body { padding: 1rem 1.1rem; font-size: 0.75rem; }
-      .how-pane .meta { font-size: 0.625rem; padding: 0.4rem 0.75rem; }
+      .how-card .big-marker { font-size: clamp(3.25rem, 14vw, 5rem); margin-bottom: 0.75rem; }
+      .how-card h2 { font-size: clamp(1.5rem, 5.5vw, 2rem); }
+      .how-card .screen-body { padding: 1rem 1.1rem; font-size: 0.75rem; }
+      .how-card .meta { font-size: 0.625rem; padding: 0.4rem 0.75rem; }
+      .how-card .screen { max-width: 100%; }
     }
 
     /* ============================================================
@@ -1939,88 +1920,107 @@
     </section>
 
     <!-- =========================================================
-         HOW IT WORKS — sticky scroll-stop sequence
+         HOW IT WORKS — three swipeable cards
+         Native horizontal scroll-snap rail. Mobile uses touch
+         swipe; desktop adds prev/next arrows + dot pagination.
+         IntersectionObserver keeps the active dot in sync with
+         whichever card is centered in the viewport.
          ========================================================= -->
-    <section class="how-sticky section-enter" id="how" aria-label="How it works">
-      <div class="how-pin">
-        <div class="how-frame">
-          <div class="how-meta">
-            <span class="label">How It Works</span>
-            <div class="how-progress">
-              <span class="dots" aria-hidden="true">
-                <span class="dot active" data-dot="0"></span>
-                <span class="dot" data-dot="1"></span>
-                <span class="dot" data-dot="2"></span>
-              </span>
-              <span class="counter" id="howCounter">01 / 03</span>
-            </div>
-          </div>
+    <section class="section section-enter how-section" id="how" aria-label="How it works">
+      <div class="container">
+        <div class="section-head">
+          <span class="label">How It Works</span>
+          <h2>Three steps to hands-free trading.</h2>
+          <p class="sub">Swipe through the three steps. Or use the arrows on desktop.</p>
+        </div>
 
-          <div class="how-stage" id="howStage">
+        <div class="how-shell">
+          <button class="how-arrow prev" id="howPrev" type="button" aria-label="Previous step">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6 L9 12 L15 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+
+          <div class="how-rail" id="howRail" tabindex="0" role="region" aria-roledescription="carousel" aria-label="How it works — three steps">
             <!-- STEP 01 -->
-            <div class="how-pane active" data-step="0">
-              <div class="text">
-                <span class="big-marker">01</span>
-                <h2>Book a discovery call.</h2>
-                <p>A free 15-minute Zoom call to walk through the system, see live results, and get every question answered. No salespeople, no pressure.</p>
-                <span class="meta">15 min · Zoom · 1-on-1</span>
-              </div>
-              <div class="screen" aria-hidden="true">
-                <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="title">calendly · 15-min discovery</span></div>
-                <div class="screen-body">
-                  <div class="row"><span>Tue 06 May</span><span class="v">14:00 BST</span></div>
-                  <div class="row"><span>Wed 07 May</span><span class="v">10:30 BST</span></div>
-                  <div class="row"><span>Thu 08 May</span><span class="v">16:30 BST</span></div>
-                  <div class="row" style="margin-top:.5rem;color:var(--ink-faint);"><span>+ 4 more this week</span><span></span></div>
+            <article class="how-card" data-step="0" aria-roledescription="slide" aria-label="Step 1 of 3">
+              <div class="how-card-inner">
+                <div class="how-card-text">
+                  <span class="big-marker">01</span>
+                  <h2>Book a discovery call.</h2>
+                  <p>A free 15-minute Zoom call to walk through the system, see live results, and get every question answered. No salespeople, no pressure.</p>
+                  <span class="meta">15 min · Zoom · 1-on-1</span>
+                </div>
+                <div class="screen" aria-hidden="true">
+                  <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="title">calendly · 15-min discovery</span></div>
+                  <div class="screen-body">
+                    <div class="row"><span>Tue 06 May</span><span class="v">14:00 BST</span></div>
+                    <div class="row"><span>Wed 07 May</span><span class="v">10:30 BST</span></div>
+                    <div class="row"><span>Thu 08 May</span><span class="v">16:30 BST</span></div>
+                    <div class="row" style="margin-top:.5rem;color:var(--ink-faint);"><span>+ 4 more this week</span><span></span></div>
+                  </div>
                 </div>
               </div>
-            </div>
+            </article>
 
             <!-- STEP 02 -->
-            <div class="how-pane" data-step="1">
-              <div class="text">
-                <span class="big-marker">02</span>
-                <h2>We configure your system.</h2>
-                <p>TradingView setup, broker integration, and predefined risk management parameters tailored to your account size — done together on a 1-on-1 onboarding call.</p>
-                <span class="meta">~60 min · Live walkthrough</span>
-              </div>
-              <div class="screen" aria-hidden="true">
-                <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="title">tradingview · alert · webhook</span></div>
-                <div class="screen-body">
-                  <div class="row"><span class="ln">strategy</span><span class="v">algo_v3.2</span></div>
-                  <div class="row"><span class="ln">symbol</span><span class="v">NQ1!</span></div>
-                  <div class="row"><span class="ln">risk_per_trade</span><span class="v">1.0%</span></div>
-                  <div class="row"><span class="ln">webhook</span><span class="v" style="color:var(--gold);">connected</span></div>
+            <article class="how-card" data-step="1" aria-roledescription="slide" aria-label="Step 2 of 3">
+              <div class="how-card-inner">
+                <div class="how-card-text">
+                  <span class="big-marker">02</span>
+                  <h2>We configure your system.</h2>
+                  <p>TradingView setup, broker integration, and predefined risk management parameters tailored to your account size — done together on a 1-on-1 onboarding call.</p>
+                  <span class="meta">~60 min · Live walkthrough</span>
+                </div>
+                <div class="screen" aria-hidden="true">
+                  <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="title">tradingview · alert · webhook</span></div>
+                  <div class="screen-body">
+                    <div class="row"><span class="ln">strategy</span><span class="v">algo_v3.2</span></div>
+                    <div class="row"><span class="ln">symbol</span><span class="v">NQ1!</span></div>
+                    <div class="row"><span class="ln">risk_per_trade</span><span class="v">1.0%</span></div>
+                    <div class="row"><span class="ln">webhook</span><span class="v" style="color:var(--gold);">connected</span></div>
+                  </div>
                 </div>
               </div>
-            </div>
+            </article>
 
             <!-- STEP 03 -->
-            <div class="how-pane" data-step="2">
-              <div class="text">
-                <span class="big-marker">03</span>
-                <h2>Trades execute automatically.</h2>
-                <p>The system handles entries, exits, stop losses, and take profits on Nasdaq and Gold. You receive weekly performance reports straight to your inbox.</p>
-                <span class="meta">24/5 · Weekly reports</span>
-              </div>
-              <div class="screen" aria-hidden="true">
-                <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="title">weekly report · w17 · 2026</span></div>
-                <svg class="screen-svg" viewBox="0 0 300 110" preserveAspectRatio="none">
-                  <line class="gline" x1="0" y1="28" x2="300" y2="28"/>
-                  <line class="gline" x1="0" y1="55" x2="300" y2="55"/>
-                  <line class="gline" x1="0" y1="82" x2="300" y2="82"/>
-                  <path class="equity" d="M8,90 L40,84 L72,76 L104,80 L136,68 L168,60 L200,55 L232,46 L264,38 L292,28"/>
-                </svg>
-                <div class="screen-body" style="padding-top:0.5rem;">
-                  <div class="row"><span class="ln">trades</span><span class="v">11</span></div>
-                  <div class="row"><span class="ln">win rate</span><span class="v">81.8%</span></div>
-                  <div class="row"><span class="ln">return</span><span class="v pos">+2.4%</span></div>
+            <article class="how-card" data-step="2" aria-roledescription="slide" aria-label="Step 3 of 3">
+              <div class="how-card-inner">
+                <div class="how-card-text">
+                  <span class="big-marker">03</span>
+                  <h2>Trades execute automatically.</h2>
+                  <p>The system handles entries, exits, stop losses, and take profits on Nasdaq and Gold. You receive weekly performance reports straight to your inbox.</p>
+                  <span class="meta">24/5 · Weekly reports</span>
+                </div>
+                <div class="screen" aria-hidden="true">
+                  <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="title">weekly report · w17 · 2026</span></div>
+                  <svg class="screen-svg" viewBox="0 0 300 110" preserveAspectRatio="none">
+                    <line class="gline" x1="0" y1="28" x2="300" y2="28"/>
+                    <line class="gline" x1="0" y1="55" x2="300" y2="55"/>
+                    <line class="gline" x1="0" y1="82" x2="300" y2="82"/>
+                    <path class="equity" d="M8,90 L40,84 L72,76 L104,80 L136,68 L168,60 L200,55 L232,46 L264,38 L292,28"/>
+                  </svg>
+                  <div class="screen-body" style="padding-top:0.5rem;">
+                    <div class="row"><span class="ln">trades</span><span class="v">11</span></div>
+                    <div class="row"><span class="ln">win rate</span><span class="v">81.8%</span></div>
+                    <div class="row"><span class="ln">return</span><span class="v pos">+2.4%</span></div>
+                  </div>
                 </div>
               </div>
-            </div>
+            </article>
           </div>
 
-          <div class="how-progress-bar" aria-hidden="true"></div>
+          <button class="how-arrow next" id="howNext" type="button" aria-label="Next step">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6 L15 12 L9 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+
+        <div class="how-controls">
+          <div class="how-dots" role="tablist" aria-label="Step indicator">
+            <button class="how-dot active" data-dot="0" type="button" aria-label="Go to step 1"></button>
+            <button class="how-dot" data-dot="1" type="button" aria-label="Go to step 2"></button>
+            <button class="how-dot" data-dot="2" type="button" aria-label="Go to step 3"></button>
+          </div>
+          <span class="how-counter" id="howCounter" aria-live="polite">01 / 03</span>
         </div>
       </div>
     </section>
@@ -2883,54 +2883,85 @@
     document.querySelectorAll('.section-enter').forEach(el => sectionIO.observe(el));
 
     // ==========================================================
-    // HOW IT WORKS — sticky scroll-stop sequence. As the user
-    // scrolls through the .how-sticky section (3× viewport tall),
-    // the inner pinned panel cycles through three step states.
-    // Disabled below 900px (CSS handles the stacked fallback).
+    // HOW IT WORKS — swipeable card carousel
+    //
+    // Native horizontal scroll-snap rail handles the swipe gesture
+    // for free on touch devices. Desktop adds prev/next arrows
+    // + dot pagination + keyboard arrow keys. The active card is
+    // tracked via IntersectionObserver on the rail itself, which
+    // means scrolling, swiping, dot-clicking, and arrow-clicking
+    // all stay in sync without each having to know about the others.
     // ==========================================================
-    (function howStickyScroll() {
-      const section = document.getElementById('how');
-      const stage = document.getElementById('howStage');
+    (function howSwipeCarousel() {
+      const rail    = document.getElementById('howRail');
       const counter = document.getElementById('howCounter');
-      const frame = section ? section.querySelector('.how-frame') : null;
-      if (!section || !stage || !counter || !frame) return;
-      const panes = stage.querySelectorAll('.how-pane');
-      const dots  = section.querySelectorAll('.how-progress .dot');
-      const total = panes.length;
-      let active = -1;
+      const prev    = document.getElementById('howPrev');
+      const next    = document.getElementById('howNext');
+      if (!rail) return;
+      const cards = Array.from(rail.querySelectorAll('.how-card'));
+      const dots  = Array.from(document.querySelectorAll('.how-dot'));
+      const total = cards.length;
+      if (!total) return;
 
-      function update() {
-        // Skip on mobile (CSS removes sticky there)
-        if (window.matchMedia('(max-width: 900px)').matches) {
-          if (active !== -1) {
-            panes.forEach(p => p.classList.add('active'));
-            dots.forEach(d => d.classList.add('active'));
-            active = -1;
-          }
-          return;
+      let active = 0;
+
+      function setActive(i) {
+        active = Math.max(0, Math.min(total - 1, i));
+        dots.forEach((d, idx) => d.classList.toggle('active', idx === active));
+        if (counter) {
+          counter.textContent = String(active + 1).padStart(2, '0') + ' / ' + String(total).padStart(2, '0');
         }
-
-        const rect = section.getBoundingClientRect();
-        const scrollableHeight = section.offsetHeight - window.innerHeight;
-        if (scrollableHeight <= 0) return;
-        const progress = Math.min(1, Math.max(0, -rect.top / scrollableHeight));
-        // Three steps mapped to progress bands [0, 0.34, 0.67]
-        const idx = Math.min(total - 1, Math.floor(progress * total));
-
-        if (idx !== active) {
-          active = idx;
-          panes.forEach((p, i) => p.classList.toggle('active', i === idx));
-          dots.forEach((d, i) => d.classList.toggle('active', i <= idx));
-          counter.textContent = String(idx + 1).padStart(2, '0') + ' / ' + String(total).padStart(2, '0');
-        }
-
-        // Bottom progress bar — scaleX(0 → 1)
-        frame.style.setProperty('--how-progress', progress.toFixed(4));
+        if (prev) prev.disabled = active === 0;
+        if (next) next.disabled = active === total - 1;
       }
 
-      window.addEventListener('scroll', update, { passive: true });
-      window.addEventListener('resize', update);
-      update();
+      function scrollToCard(i) {
+        const target = cards[Math.max(0, Math.min(total - 1, i))];
+        if (!target) return;
+        // scrollIntoView with inline:'center' keeps snap-aligned
+        // cards centered in the rail viewport regardless of any
+        // per-card padding or rail gap.
+        target.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+      }
+
+      // Sync active state from whichever card is currently centered
+      // in the rail. threshold 0.6 means the card must be at least
+      // 60% inside the rail before it counts as "active" — avoids
+      // flicker between adjacent cards mid-swipe.
+      if ('IntersectionObserver' in window) {
+        const io = new IntersectionObserver((entries) => {
+          let mostVisible = null;
+          let mostRatio = 0;
+          for (const entry of entries) {
+            if (entry.intersectionRatio > mostRatio) {
+              mostRatio = entry.intersectionRatio;
+              mostVisible = entry.target;
+            }
+          }
+          if (mostVisible && mostRatio >= 0.6) {
+            const idx = cards.indexOf(mostVisible);
+            if (idx !== -1 && idx !== active) setActive(idx);
+          }
+        }, { root: rail, threshold: [0.4, 0.6, 0.8] });
+        cards.forEach(c => io.observe(c));
+      }
+
+      // Arrow buttons
+      if (prev) prev.addEventListener('click', () => scrollToCard(active - 1));
+      if (next) next.addEventListener('click', () => scrollToCard(active + 1));
+
+      // Dot pagination
+      dots.forEach((d, i) => d.addEventListener('click', () => scrollToCard(i)));
+
+      // Keyboard navigation when the rail itself has focus
+      rail.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowLeft')  { e.preventDefault(); scrollToCard(active - 1); }
+        if (e.key === 'ArrowRight') { e.preventDefault(); scrollToCard(active + 1); }
+        if (e.key === 'Home')       { e.preventDefault(); scrollToCard(0); }
+        if (e.key === 'End')        { e.preventDefault(); scrollToCard(total - 1); }
+      });
+
+      setActive(0);
     })();
 
     // ==========================================================
