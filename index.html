@@ -1056,75 +1056,62 @@
        top and cycles through three step-states as the user scrolls.
        Mobile collapses to a normal stacked flow.
        ============================================================ */
-    /* HOW IT WORKS — swipeable card carousel */
+    /* HOW IT WORKS — stacked swipeable card deck */
     .how-section { padding-block: clamp(4rem, 9vw, 7rem); }
 
-    .how-shell {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      margin-top: 2rem;
+    .how-deck-wrap {
+      margin-top: 2.5rem;
+      perspective: 1500px;
     }
 
-    .how-arrow {
-      flex-shrink: 0;
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      border: 1px solid var(--hairline);
-      background: rgba(0, 0, 0, 0.4);
-      color: var(--ink-soft);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: var(--transition);
-    }
-    .how-arrow:hover:not(:disabled) {
-      border-color: var(--gold);
-      color: var(--gold);
-    }
-    .how-arrow:disabled {
-      opacity: 0.3;
-      cursor: not-allowed;
-    }
-    .how-arrow svg { width: 18px; height: 18px; }
-
-    /* Hide arrows on touch — natural swipe replaces them */
-    @media (max-width: 720px) {
-      .how-arrow { display: none; }
+    /* Deck container — relative, fixed height; cards stack inside it */
+    .how-deck {
+      position: relative;
+      height: clamp(520px, 60vw, 640px);
+      max-width: 920px;
+      margin: 0 auto;
+      touch-action: pan-y;     /* allow vertical scroll, capture horizontal drag */
+      user-select: none;
     }
 
-    .how-rail {
-      flex: 1;
-      min-width: 0;
-      display: flex;
-      gap: 1rem;
-      overflow-x: auto;
-      scroll-snap-type: x mandatory;
-      scroll-behavior: smooth;
-      -webkit-overflow-scrolling: touch;
-      scrollbar-width: none;
-      padding: 0.5rem 0.25rem;
-      outline: none;
-    }
-    .how-rail::-webkit-scrollbar { display: none; }
-    .how-rail:focus-visible {
-      box-shadow: 0 0 0 1px var(--hairline-gold);
-      border-radius: 16px;
-    }
-
+    /* Each card sits absolutely in the deck, transformed via JS to
+       create the stacked-with-peek look. The active card is on top
+       and draggable; behind cards peek out, scaled down and dimmer. */
     .how-card {
-      flex: 0 0 100%;
-      scroll-snap-align: center;
-      scroll-snap-stop: always;
+      position: absolute;
+      inset: 0;
+      margin: 0;
       border: 1px solid var(--hairline);
-      border-radius: 18px;
-      background: rgba(255, 255, 255, 0.012);
+      border-radius: 20px;
+      background: linear-gradient(180deg, rgba(20, 16, 8, 0.92), rgba(8, 6, 3, 0.96));
       padding: clamp(1.75rem, 4vw, 3rem);
-      transition: border-color var(--transition);
+      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 24px 60px rgba(0, 0, 0, 0.45);
+      will-change: transform, opacity;
+      transform-origin: center top;
+      transition: transform 360ms cubic-bezier(0.2, 0.8, 0.2, 1), opacity 240ms ease-out;
     }
-    .how-card:hover { border-color: var(--hairline-hi); }
+    /* Top card is the only one that accepts drag/click events */
+    .how-card.is-top {
+      cursor: grab;
+    }
+    .how-card.is-top:active { cursor: grabbing; }
+    .how-card:not(.is-top) {
+      pointer-events: none;
+    }
+    /* While the user is actively dragging, kill the transition so the
+       card follows the finger 1:1 */
+    .how-card.dragging {
+      transition: none;
+    }
+
+    /* "Fly off" state — card has been swiped past threshold and is
+       animating off-screen before the deck restacks. */
+    .how-card.flying {
+      transition: transform 320ms cubic-bezier(0.4, 0, 0.6, 1), opacity 240ms ease-out;
+      pointer-events: none;
+    }
+
+    .how-card:hover.is-top { border-color: var(--hairline-hi); }
 
     .how-card-inner {
       display: grid;
@@ -1223,14 +1210,32 @@
     .how-card .screen-svg .gline { stroke: rgba(255,255,255,0.05); stroke-width: 1; }
     .how-card .screen-svg .equity { fill: none; stroke: var(--gold); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
 
-    /* Pagination — dots + counter, centered below the rail */
+    /* Pagination row — arrows + dots + counter, centered below the deck */
     .how-controls {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 1.5rem;
+      gap: 1rem;
       margin-top: 1.75rem;
+      flex-wrap: wrap;
     }
+    .how-arrow {
+      flex-shrink: 0;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      border: 1px solid var(--hairline);
+      background: rgba(0, 0, 0, 0.4);
+      color: var(--ink-soft);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition);
+      padding: 0;
+    }
+    .how-arrow:hover { border-color: var(--gold); color: var(--gold); }
+    .how-arrow svg { width: 16px; height: 16px; }
     .how-dots {
       display: inline-flex;
       gap: 0.4rem;
@@ -1934,14 +1939,10 @@
           <p class="sub">Swipe through the three steps. Or use the arrows on desktop.</p>
         </div>
 
-        <div class="how-shell">
-          <button class="how-arrow prev" id="howPrev" type="button" aria-label="Previous step">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6 L9 12 L15 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </button>
-
-          <div class="how-rail" id="howRail" tabindex="0" role="region" aria-roledescription="carousel" aria-label="How it works — three steps">
+        <div class="how-deck-wrap">
+          <div class="how-deck" id="howDeck" role="region" aria-roledescription="card stack" aria-label="How it works — three steps">
             <!-- STEP 01 -->
-            <article class="how-card" data-step="0" aria-roledescription="slide" aria-label="Step 1 of 3">
+            <article class="how-card" data-step="0" aria-roledescription="card" aria-label="Step 1 of 3">
               <div class="how-card-inner">
                 <div class="how-card-text">
                   <span class="big-marker">01</span>
@@ -1962,7 +1963,7 @@
             </article>
 
             <!-- STEP 02 -->
-            <article class="how-card" data-step="1" aria-roledescription="slide" aria-label="Step 2 of 3">
+            <article class="how-card" data-step="1" aria-roledescription="card" aria-label="Step 2 of 3">
               <div class="how-card-inner">
                 <div class="how-card-text">
                   <span class="big-marker">02</span>
@@ -1983,7 +1984,7 @@
             </article>
 
             <!-- STEP 03 -->
-            <article class="how-card" data-step="2" aria-roledescription="slide" aria-label="Step 3 of 3">
+            <article class="how-card" data-step="2" aria-roledescription="card" aria-label="Step 3 of 3">
               <div class="how-card-inner">
                 <div class="how-card-text">
                   <span class="big-marker">03</span>
@@ -2008,19 +2009,21 @@
               </div>
             </article>
           </div>
-
-          <button class="how-arrow next" id="howNext" type="button" aria-label="Next step">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6 L15 12 L9 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </button>
         </div>
 
         <div class="how-controls">
+          <button class="how-arrow prev" id="howPrev" type="button" aria-label="Previous step">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6 L9 12 L15 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
           <div class="how-dots" role="tablist" aria-label="Step indicator">
             <button class="how-dot active" data-dot="0" type="button" aria-label="Go to step 1"></button>
             <button class="how-dot" data-dot="1" type="button" aria-label="Go to step 2"></button>
             <button class="how-dot" data-dot="2" type="button" aria-label="Go to step 3"></button>
           </div>
           <span class="how-counter" id="howCounter" aria-live="polite">01 / 03</span>
+          <button class="how-arrow next" id="howNext" type="button" aria-label="Next step">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6 L15 12 L9 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
         </div>
       </div>
     </section>
@@ -2883,85 +2886,183 @@
     document.querySelectorAll('.section-enter').forEach(el => sectionIO.observe(el));
 
     // ==========================================================
-    // HOW IT WORKS — swipeable card carousel
+    // HOW IT WORKS — stacked swipeable card deck
     //
-    // Native horizontal scroll-snap rail handles the swipe gesture
-    // for free on touch devices. Desktop adds prev/next arrows
-    // + dot pagination + keyboard arrow keys. The active card is
-    // tracked via IntersectionObserver on the rail itself, which
-    // means scrolling, swiping, dot-clicking, and arrow-clicking
-    // all stay in sync without each having to know about the others.
+    // Cards are stacked absolutely inside the deck container. The
+    // top card is draggable via pointer events (works for touch +
+    // mouse + pen). On release past a swipe threshold the card flies
+    // off-screen and the deck cycles to the next/previous step.
+    //
+    // Layout transforms are applied imperatively in `layout()` so
+    // every interaction (drag, arrow click, dot click, keyboard)
+    // ends up calling the same single source of truth.
     // ==========================================================
-    (function howSwipeCarousel() {
-      const rail    = document.getElementById('howRail');
+    (function howCardDeck() {
+      const deck    = document.getElementById('howDeck');
       const counter = document.getElementById('howCounter');
-      const prev    = document.getElementById('howPrev');
-      const next    = document.getElementById('howNext');
-      if (!rail) return;
-      const cards = Array.from(rail.querySelectorAll('.how-card'));
+      const prevBtn = document.getElementById('howPrev');
+      const nextBtn = document.getElementById('howNext');
+      if (!deck) return;
+      const cards = Array.from(deck.querySelectorAll('.how-card'));
       const dots  = Array.from(document.querySelectorAll('.how-dot'));
       const total = cards.length;
       if (!total) return;
 
       let active = 0;
+      let dragging = false;
+      let pointerId = null;
+      let startX = 0;
+      let startY = 0;
+      let dragX = 0;
+      let topCard = null;
+      let aborted = false; // true if vertical scroll intent detected
 
-      function setActive(i) {
-        active = Math.max(0, Math.min(total - 1, i));
-        dots.forEach((d, idx) => d.classList.toggle('active', idx === active));
+      // Single source of truth: stacks every card based on its offset
+      // from the active index.  Offset 0 = top, 1 = behind, 2 = behind-behind.
+      function layout() {
+        cards.forEach((card, i) => {
+          const offset = ((i - active) + total) % total;
+          const isTop = offset === 0;
+          const ty = offset * 14;          // px down
+          const scale = 1 - offset * 0.04; // shrink behind cards
+          const op = offset === 0 ? 1 : Math.max(0, 1 - offset * 0.4);
+          card.style.zIndex = String(total - offset);
+          card.style.transform = 'translate3d(0, ' + ty + 'px, 0) scale(' + scale + ')';
+          card.style.opacity = String(op);
+          card.classList.toggle('is-top', isTop);
+          card.classList.remove('flying', 'dragging');
+        });
         if (counter) {
           counter.textContent = String(active + 1).padStart(2, '0') + ' / ' + String(total).padStart(2, '0');
         }
-        if (prev) prev.disabled = active === 0;
-        if (next) next.disabled = active === total - 1;
+        dots.forEach((d, i) => d.classList.toggle('active', i === active));
       }
 
-      function scrollToCard(i) {
-        const target = cards[Math.max(0, Math.min(total - 1, i))];
-        if (!target) return;
-        // scrollIntoView with inline:'center' keeps snap-aligned
-        // cards centered in the rail viewport regardless of any
-        // per-card padding or rail gap.
-        target.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+      function goNext() { active = (active + 1) % total; layout(); }
+      function goPrev() { active = (active - 1 + total) % total; layout(); }
+      function goTo(i)  { active = ((i % total) + total) % total; layout(); }
+
+      // Drag handling — pointer events cover touch, mouse, pen
+      function onPointerDown(e) {
+        // Only initiate from the top card
+        const card = e.target.closest('.how-card.is-top');
+        if (!card) return;
+        // Don't hijack drag from interactive elements inside the card
+        if (e.target.closest('a, button, input, select, textarea')) return;
+
+        dragging = true;
+        aborted = false;
+        pointerId = e.pointerId;
+        topCard = card;
+        startX = e.clientX;
+        startY = e.clientY;
+        dragX = 0;
+        topCard.classList.add('dragging');
+        try { topCard.setPointerCapture(pointerId); } catch (_) {}
       }
 
-      // Sync active state from whichever card is currently centered
-      // in the rail. threshold 0.6 means the card must be at least
-      // 60% inside the rail before it counts as "active" — avoids
-      // flicker between adjacent cards mid-swipe.
-      if ('IntersectionObserver' in window) {
-        const io = new IntersectionObserver((entries) => {
-          let mostVisible = null;
-          let mostRatio = 0;
-          for (const entry of entries) {
-            if (entry.intersectionRatio > mostRatio) {
-              mostRatio = entry.intersectionRatio;
-              mostVisible = entry.target;
-            }
+      function onPointerMove(e) {
+        if (!dragging || e.pointerId !== pointerId || aborted || !topCard) return;
+        dragX = e.clientX - startX;
+        const dy = e.clientY - startY;
+
+        // If user is mostly scrolling vertically, abort the drag
+        // (don't fight the page scroll)
+        if (Math.abs(dy) > Math.abs(dragX) + 8) {
+          aborted = true;
+          if (pointerId != null) {
+            try { topCard.releasePointerCapture(pointerId); } catch (_) {}
           }
-          if (mostVisible && mostRatio >= 0.6) {
-            const idx = cards.indexOf(mostVisible);
-            if (idx !== -1 && idx !== active) setActive(idx);
-          }
-        }, { root: rail, threshold: [0.4, 0.6, 0.8] });
-        cards.forEach(c => io.observe(c));
+          topCard.classList.remove('dragging');
+          layout();
+          dragging = false;
+          pointerId = null;
+          topCard = null;
+          return;
+        }
+
+        const rotate = Math.max(-12, Math.min(12, dragX / 30));
+        topCard.style.transform =
+          'translate3d(' + dragX + 'px, 0, 0) rotate(' + rotate + 'deg)';
+        // Slight fade as it leaves
+        topCard.style.opacity = String(Math.max(0.4, 1 - Math.abs(dragX) / 600));
       }
+
+      function onPointerUp(e) {
+        if (!dragging || aborted || !topCard) {
+          dragging = false;
+          pointerId = null;
+          topCard = null;
+          return;
+        }
+        if (pointerId != null) {
+          try { topCard.releasePointerCapture(pointerId); } catch (_) {}
+        }
+        topCard.classList.remove('dragging');
+
+        const threshold = topCard.offsetWidth * 0.22;
+        if (Math.abs(dragX) > threshold) {
+          // Fly off in the swipe direction, then advance the deck
+          const direction = dragX > 0 ? 1 : -1;
+          const flyDistance = (window.innerWidth || 1200) * 1.1;
+          topCard.classList.add('flying');
+          topCard.style.transform =
+            'translate3d(' + (direction * flyDistance) + 'px, 0, 0) rotate(' +
+            (direction * 22) + 'deg)';
+          topCard.style.opacity = '0';
+          // After the fly-off animation, advance the active index and
+          // re-layout (which clears all inline transforms).
+          setTimeout(() => {
+            // swipe right (positive dragX) = previous; swipe left = next
+            if (direction > 0) goPrev();
+            else goNext();
+          }, 320);
+        } else {
+          // Below threshold — snap back
+          layout();
+        }
+
+        dragging = false;
+        pointerId = null;
+        topCard = null;
+      }
+
+      function onPointerCancel() {
+        if (!dragging || !topCard) return;
+        if (pointerId != null) {
+          try { topCard.releasePointerCapture(pointerId); } catch (_) {}
+        }
+        topCard.classList.remove('dragging');
+        dragging = false;
+        pointerId = null;
+        topCard = null;
+        layout();
+      }
+
+      deck.addEventListener('pointerdown',   onPointerDown);
+      deck.addEventListener('pointermove',   onPointerMove);
+      deck.addEventListener('pointerup',     onPointerUp);
+      deck.addEventListener('pointercancel', onPointerCancel);
 
       // Arrow buttons
-      if (prev) prev.addEventListener('click', () => scrollToCard(active - 1));
-      if (next) next.addEventListener('click', () => scrollToCard(active + 1));
+      if (prevBtn) prevBtn.addEventListener('click', goPrev);
+      if (nextBtn) nextBtn.addEventListener('click', goNext);
 
       // Dot pagination
-      dots.forEach((d, i) => d.addEventListener('click', () => scrollToCard(i)));
+      dots.forEach((d, i) => d.addEventListener('click', () => goTo(i)));
 
-      // Keyboard navigation when the rail itself has focus
-      rail.addEventListener('keydown', (e) => {
-        if (e.key === 'ArrowLeft')  { e.preventDefault(); scrollToCard(active - 1); }
-        if (e.key === 'ArrowRight') { e.preventDefault(); scrollToCard(active + 1); }
-        if (e.key === 'Home')       { e.preventDefault(); scrollToCard(0); }
-        if (e.key === 'End')        { e.preventDefault(); scrollToCard(total - 1); }
-      });
+      // Keyboard navigation — only when an arrow / dot in this section
+      // has focus (otherwise we'd hijack arrow keys site-wide)
+      const section = document.getElementById('how');
+      if (section) {
+        section.addEventListener('keydown', (e) => {
+          if (!section.contains(document.activeElement)) return;
+          if (e.key === 'ArrowLeft')  { e.preventDefault(); goPrev(); }
+          if (e.key === 'ArrowRight') { e.preventDefault(); goNext(); }
+        });
+      }
 
-      setActive(0);
+      layout();
     })();
 
     // ==========================================================
