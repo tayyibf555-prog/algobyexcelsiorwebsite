@@ -1064,27 +1064,31 @@
       perspective: 1500px;
     }
 
-    /* Deck container — relative, fixed height; cards stack inside it */
+    /* Deck container — uses CSS grid so all three cards occupy the
+       SAME cell, stacking naturally. The cell sizes to the tallest
+       card on each viewport, so we never get fixed-height overflow
+       on a phone where a step's content is longer than expected. */
     .how-deck {
-      position: relative;
-      height: clamp(520px, 60vw, 640px);
+      display: grid;
+      grid-template-columns: 1fr;
       max-width: 920px;
       margin: 0 auto;
       touch-action: pan-y;     /* allow vertical scroll, capture horizontal drag */
       user-select: none;
+      -webkit-user-select: none;
     }
 
-    /* Each card sits absolutely in the deck, transformed via JS to
-       create the stacked-with-peek look. The active card is on top
-       and draggable; behind cards peek out, scaled down and dimmer. */
+    /* All cards land in the same grid cell — they overlap. JS then
+       transforms them (translateY + scale) to create the stacked-
+       with-peek look. */
     .how-card {
-      position: absolute;
-      inset: 0;
+      grid-column: 1 / 2;
+      grid-row: 1 / 2;
       margin: 0;
       border: 1px solid var(--hairline);
       border-radius: 20px;
       background: linear-gradient(180deg, rgba(20, 16, 8, 0.92), rgba(8, 6, 3, 0.96));
-      padding: clamp(1.75rem, 4vw, 3rem);
+      padding: clamp(1.5rem, 4vw, 2.75rem);
       box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 24px 60px rgba(0, 0, 0, 0.45);
       will-change: transform, opacity;
       transform-origin: center top;
@@ -1112,6 +1116,23 @@
     }
 
     .how-card:hover.is-top { border-color: var(--hairline-hi); }
+
+    /* First-time swipe hint — a subtle nudge animation runs once
+       on mobile when the deck enters the viewport, so users know
+       the top card is interactive. */
+    .how-card.is-top.hint {
+      animation: howSwipeHint 1400ms cubic-bezier(0.4, 0, 0.4, 1) 1;
+    }
+    @keyframes howSwipeHint {
+      0%   { transform: translate3d(0, 0, 0) rotate(0deg); }
+      35%  { transform: translate3d(-22px, 0, 0) rotate(-2deg); }
+      70%  { transform: translate3d(8px, 0, 0) rotate(0.5deg); }
+      100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .how-card { transition: none; }
+      .how-card.is-top.hint { animation: none; }
+    }
 
     .how-card-inner {
       display: grid;
@@ -1241,17 +1262,31 @@
       gap: 0.4rem;
       align-items: center;
     }
+    /* The .how-dot button itself is 44×44 (Apple HIG-compliant tap
+       target on touch devices); the visible bar is drawn as a
+       pseudo-element so the look stays compact while the hit area
+       is generous. */
     .how-dot {
-      width: 28px;
-      height: 3px;
-      background: var(--hairline);
+      width: 44px;
+      height: 28px;
+      background: transparent;
       border: 0;
       padding: 0;
       cursor: pointer;
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .how-dot::before {
+      content: '';
+      width: 28px;
+      height: 3px;
+      background: var(--hairline);
       transition: background 280ms ease-out;
     }
-    .how-dot:hover:not(.active) { background: rgba(245, 239, 227, 0.25); }
-    .how-dot.active { background: var(--gold); }
+    .how-dot:hover:not(.active)::before { background: rgba(245, 239, 227, 0.25); }
+    .how-dot.active::before { background: var(--gold); }
     .how-counter {
       font-family: var(--font-mono);
       font-size: 0.6875rem;
@@ -1262,12 +1297,22 @@
       text-align: center;
     }
 
+    /* Mobile refinements — tighter peek, smaller content, more
+       generous controls below the deck. */
+    @media (max-width: 720px) {
+      .how-deck-wrap { margin-top: 1.75rem; }
+      .how-controls { gap: 0.6rem; margin-top: 1.25rem; }
+      .how-arrow { width: 44px; height: 44px; }
+    }
     @media (max-width: 480px) {
-      .how-card .big-marker { font-size: clamp(3.25rem, 14vw, 5rem); margin-bottom: 0.75rem; }
-      .how-card h2 { font-size: clamp(1.5rem, 5.5vw, 2rem); }
-      .how-card .screen-body { padding: 1rem 1.1rem; font-size: 0.75rem; }
+      .how-card { border-radius: 16px; padding: 1.25rem 1.15rem; }
+      .how-card .big-marker { font-size: clamp(3rem, 13vw, 4.5rem); margin-bottom: 0.5rem; }
+      .how-card h2 { font-size: clamp(1.4rem, 5.2vw, 1.875rem); margin-bottom: 0.85rem; }
+      .how-card p { font-size: 0.9375rem; line-height: 1.55; margin-bottom: 1rem; }
       .how-card .meta { font-size: 0.625rem; padding: 0.4rem 0.75rem; }
       .how-card .screen { max-width: 100%; }
+      .how-card .screen-body { padding: 0.85rem 1rem; font-size: 0.75rem; }
+      .how-card-inner { gap: 1.1rem; }
     }
 
     /* ============================================================
@@ -2908,23 +2953,37 @@
       const total = cards.length;
       if (!total) return;
 
-      let active = 0;
-      let dragging = false;
-      let pointerId = null;
-      let startX = 0;
-      let startY = 0;
-      let dragX = 0;
-      let topCard = null;
-      let aborted = false; // true if vertical scroll intent detected
+      const isTouch = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-      // Single source of truth: stacks every card based on its offset
-      // from the active index.  Offset 0 = top, 1 = behind, 2 = behind-behind.
+      let active = 0;
+      // Two-phase drag state: "potential" (pointer down, gesture not
+      // yet classified) vs "dragging" (horizontal intent confirmed).
+      let phase = 'idle';
+      let pointerId = null;
+      let startX = 0, startY = 0;
+      let dragX = 0;
+      let lastX = 0, lastT = 0, velocity = 0;
+      let topCard = null;
+
+      // Tighter threshold on mobile — feels snappier on a phone screen.
+      const SWIPE_RATIO = isTouch ? 0.18 : 0.22;
+      // Pixel threshold before we lock in the horizontal-drag intent.
+      // Below this, we don't know if the user is swiping the card or
+      // scrolling the page.
+      const INTENT_PX = 8;
+
+      // Single source of truth — stack each card based on its offset
+      // from the active index. Offset 0 = top, 1 = behind, 2 = third.
       function layout() {
+        // Slightly tighter peek on mobile so the stack isn't too tall.
+        const tyStep = isTouch ? 10 : 14;
+        const scaleStep = isTouch ? 0.03 : 0.04;
         cards.forEach((card, i) => {
           const offset = ((i - active) + total) % total;
           const isTop = offset === 0;
-          const ty = offset * 14;          // px down
-          const scale = 1 - offset * 0.04; // shrink behind cards
+          const ty = offset * tyStep;
+          const scale = 1 - offset * scaleStep;
           const op = offset === 0 ? 1 : Math.max(0, 1 - offset * 0.4);
           card.style.zIndex = String(total - offset);
           card.style.transform = 'translate3d(0, ' + ty + 'px, 0) scale(' + scale + ')';
@@ -2933,7 +2992,8 @@
           card.classList.remove('flying', 'dragging');
         });
         if (counter) {
-          counter.textContent = String(active + 1).padStart(2, '0') + ' / ' + String(total).padStart(2, '0');
+          counter.textContent =
+            String(active + 1).padStart(2, '0') + ' / ' + String(total).padStart(2, '0');
         }
         dots.forEach((d, i) => d.classList.toggle('active', i === active));
       }
@@ -2942,117 +3002,152 @@
       function goPrev() { active = (active - 1 + total) % total; layout(); }
       function goTo(i)  { active = ((i % total) + total) % total; layout(); }
 
-      // Drag handling — pointer events cover touch, mouse, pen
+      // Apply transform during drag (used while phase === 'dragging')
+      function applyDragTransform() {
+        if (!topCard) return;
+        const rotate = Math.max(-12, Math.min(12, dragX / 30));
+        topCard.style.transform =
+          'translate3d(' + dragX + 'px, 0, 0) rotate(' + rotate + 'deg)';
+        topCard.style.opacity =
+          String(Math.max(0.4, 1 - Math.abs(dragX) / 600));
+      }
+
+      function clearDragState() {
+        phase = 'idle';
+        pointerId = null;
+        topCard = null;
+        dragX = 0;
+        velocity = 0;
+      }
+
       function onPointerDown(e) {
-        // Only initiate from the top card
+        if (phase !== 'idle') return;
         const card = e.target.closest('.how-card.is-top');
         if (!card) return;
-        // Don't hijack drag from interactive elements inside the card
         if (e.target.closest('a, button, input, select, textarea')) return;
 
-        dragging = true;
-        aborted = false;
+        phase = 'potential';
         pointerId = e.pointerId;
         topCard = card;
         startX = e.clientX;
         startY = e.clientY;
+        lastX = e.clientX;
+        lastT = e.timeStamp || performance.now();
         dragX = 0;
-        topCard.classList.add('dragging');
-        try { topCard.setPointerCapture(pointerId); } catch (_) {}
+        velocity = 0;
+        // Strip any first-load hint so user-driven motion takes over
+        topCard.classList.remove('hint');
       }
 
       function onPointerMove(e) {
-        if (!dragging || e.pointerId !== pointerId || aborted || !topCard) return;
-        dragX = e.clientX - startX;
+        if (phase === 'idle' || e.pointerId !== pointerId || !topCard) return;
+        const dx = e.clientX - startX;
         const dy = e.clientY - startY;
 
-        // If user is mostly scrolling vertically, abort the drag
-        // (don't fight the page scroll)
-        if (Math.abs(dy) > Math.abs(dragX) + 8) {
-          aborted = true;
-          if (pointerId != null) {
-            try { topCard.releasePointerCapture(pointerId); } catch (_) {}
+        if (phase === 'potential') {
+          // Classify the gesture. Bias horizontal: card swipe wins
+          // ties; vertical-dominant ones release control to the page.
+          const ax = Math.abs(dx);
+          const ay = Math.abs(dy);
+          if (ax < INTENT_PX && ay < INTENT_PX) return;        // not enough data yet
+          if (ay > ax) {                                       // vertical scroll intent — let it scroll
+            clearDragState();
+            return;
           }
-          topCard.classList.remove('dragging');
-          layout();
-          dragging = false;
-          pointerId = null;
-          topCard = null;
-          return;
+          // Horizontal — promote to drag. Capture pointer NOW (not on
+          // pointerdown) so the page never gets stuck while we figure
+          // out intent.
+          phase = 'dragging';
+          topCard.classList.add('dragging');
+          try { topCard.setPointerCapture(pointerId); } catch (_) {}
         }
 
-        const rotate = Math.max(-12, Math.min(12, dragX / 30));
-        topCard.style.transform =
-          'translate3d(' + dragX + 'px, 0, 0) rotate(' + rotate + 'deg)';
-        // Slight fade as it leaves
-        topCard.style.opacity = String(Math.max(0.4, 1 - Math.abs(dragX) / 600));
+        if (phase === 'dragging') {
+          dragX = dx;
+          // Track velocity in px/ms over a short window for fling detection
+          const now = e.timeStamp || performance.now();
+          const dt = now - lastT;
+          if (dt > 0) velocity = (e.clientX - lastX) / dt;
+          lastX = e.clientX;
+          lastT = now;
+          applyDragTransform();
+        }
       }
 
       function onPointerUp(e) {
-        if (!dragging || aborted || !topCard) {
-          dragging = false;
-          pointerId = null;
-          topCard = null;
+        if (phase === 'idle' || !topCard) { clearDragState(); return; }
+        if (phase === 'potential') {
+          // Pointer up before we ever started a drag — treat as a
+          // simple click. Reset and fall through to layout for tidiness.
+          clearDragState();
+          layout();
           return;
         }
+        // phase === 'dragging'
         if (pointerId != null) {
           try { topCard.releasePointerCapture(pointerId); } catch (_) {}
         }
         topCard.classList.remove('dragging');
 
-        const threshold = topCard.offsetWidth * 0.22;
-        if (Math.abs(dragX) > threshold) {
-          // Fly off in the swipe direction, then advance the deck
-          const direction = dragX > 0 ? 1 : -1;
+        const threshold = topCard.offsetWidth * SWIPE_RATIO;
+        // Fling: velocity above 0.5 px/ms triggers a swipe even if
+        // the absolute distance is below threshold (snappy mobile feel).
+        const isFling = Math.abs(velocity) > 0.5 &&
+          Math.sign(velocity) === Math.sign(dragX);
+
+        if (Math.abs(dragX) > threshold || isFling) {
+          const direction = (dragX !== 0 ? Math.sign(dragX) : Math.sign(velocity)) || 1;
+          if (reduceMotion) {
+            // Reduced motion: skip the fly-off animation, just advance
+            if (direction > 0) goPrev(); else goNext();
+            clearDragState();
+            return;
+          }
           const flyDistance = (window.innerWidth || 1200) * 1.1;
-          topCard.classList.add('flying');
-          topCard.style.transform =
+          const card = topCard;
+          card.classList.add('flying');
+          card.style.transform =
             'translate3d(' + (direction * flyDistance) + 'px, 0, 0) rotate(' +
             (direction * 22) + 'deg)';
-          topCard.style.opacity = '0';
-          // After the fly-off animation, advance the active index and
-          // re-layout (which clears all inline transforms).
+          card.style.opacity = '0';
+          clearDragState();
           setTimeout(() => {
-            // swipe right (positive dragX) = previous; swipe left = next
-            if (direction > 0) goPrev();
-            else goNext();
-          }, 320);
+            // swipe right (positive) = previous; swipe left = next
+            if (direction > 0) goPrev(); else goNext();
+          }, 280);
         } else {
           // Below threshold — snap back
           layout();
+          clearDragState();
         }
-
-        dragging = false;
-        pointerId = null;
-        topCard = null;
       }
 
       function onPointerCancel() {
-        if (!dragging || !topCard) return;
+        if (phase === 'idle' || !topCard) { clearDragState(); return; }
         if (pointerId != null) {
           try { topCard.releasePointerCapture(pointerId); } catch (_) {}
         }
-        topCard.classList.remove('dragging');
-        dragging = false;
-        pointerId = null;
-        topCard = null;
+        if (topCard) topCard.classList.remove('dragging');
+        clearDragState();
         layout();
       }
 
+      // Use passive listeners where we can to keep scroll perf snappy.
+      // We never preventDefault during the drag, so passive: true is
+      // safe on the move handler.
       deck.addEventListener('pointerdown',   onPointerDown);
-      deck.addEventListener('pointermove',   onPointerMove);
+      deck.addEventListener('pointermove',   onPointerMove,   { passive: true });
       deck.addEventListener('pointerup',     onPointerUp);
       deck.addEventListener('pointercancel', onPointerCancel);
 
-      // Arrow buttons
+      // Arrows
       if (prevBtn) prevBtn.addEventListener('click', goPrev);
       if (nextBtn) nextBtn.addEventListener('click', goNext);
 
-      // Dot pagination
+      // Dots
       dots.forEach((d, i) => d.addEventListener('click', () => goTo(i)));
 
-      // Keyboard navigation — only when an arrow / dot in this section
-      // has focus (otherwise we'd hijack arrow keys site-wide)
+      // Keyboard nav — only when focus is inside the how section
       const section = document.getElementById('how');
       if (section) {
         section.addEventListener('keydown', (e) => {
@@ -3062,7 +3157,26 @@
         });
       }
 
+      // Initial layout, then nudge a swipe-hint animation on the
+      // top card the first time the deck enters the viewport on
+      // touch devices, so users see it's draggable.
       layout();
+      if (isTouch && !reduceMotion && 'IntersectionObserver' in window) {
+        const hintObserver = new IntersectionObserver((entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) {
+              const top = cards.find(c => c.classList.contains('is-top'));
+              if (top) {
+                top.classList.add('hint');
+                top.addEventListener('animationend', () => top.classList.remove('hint'), { once: true });
+              }
+              hintObserver.disconnect();
+              break;
+            }
+          }
+        }, { threshold: 0.5 });
+        hintObserver.observe(deck);
+      }
     })();
 
     // ==========================================================
