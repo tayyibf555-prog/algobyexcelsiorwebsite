@@ -1231,6 +1231,50 @@
     .how-card .screen-svg .gline { stroke: rgba(255,255,255,0.05); stroke-width: 1; }
     .how-card .screen-svg .equity { fill: none; stroke: var(--gold); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
 
+    /* Swipe hint — sits between the deck and the controls. Tells the
+       user what to do, hides itself once they actually do it. The
+       gold arrow nudges right on a loop to draw the eye. JS adds
+       .dismissed once the user interacts (swipe, drag, arrow click,
+       or dot click). */
+    .how-hint {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.65rem;
+      margin: 1.25rem auto 0;
+      max-width: 380px;
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      transition: opacity 480ms ease-out, transform 480ms ease-out;
+    }
+    .how-hint-rule {
+      flex: 1;
+      height: 1px;
+      background: var(--hairline);
+    }
+    .how-hint-arrow {
+      color: var(--gold);
+      font-weight: 700;
+      letter-spacing: 0;
+      display: inline-block;
+      animation: howHintArrow 1.6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    @keyframes howHintArrow {
+      0%, 100% { transform: translateX(-3px); opacity: 0.55; }
+      50%      { transform: translateX(4px);  opacity: 1; }
+    }
+    .how-hint.dismissed {
+      opacity: 0;
+      transform: translateY(-4px);
+      pointer-events: none;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .how-hint-arrow { animation: none; }
+    }
+
     /* Pagination row — arrows + dots + counter, centered below the deck */
     .how-controls {
       display: flex;
@@ -2199,6 +2243,13 @@
             </article>
           </div>
         </div>
+
+        <p class="how-hint" id="howHint" aria-hidden="true">
+          <span class="how-hint-rule"></span>
+          <span class="how-hint-text">Swipe to see</span>
+          <span class="how-hint-arrow" aria-hidden="true">→</span>
+          <span class="how-hint-rule"></span>
+        </p>
 
         <div class="how-controls">
           <button class="how-arrow prev" id="howPrev" type="button" aria-label="Previous step">
@@ -3203,9 +3254,19 @@
         dots.forEach((d, i) => d.classList.toggle('active', i === active));
       }
 
-      function goNext() { active = (active + 1) % total; layout(); }
-      function goPrev() { active = (active - 1 + total) % total; layout(); }
-      function goTo(i)  { active = ((i % total) + total) % total; layout(); }
+      // Swipe-hint dismissal — once the user interacts with the
+      // deck in any way, the "Swipe to see →" caption fades out.
+      const hint = document.getElementById('howHint');
+      let hintDismissed = false;
+      function dismissHint() {
+        if (hintDismissed || !hint) return;
+        hintDismissed = true;
+        hint.classList.add('dismissed');
+      }
+
+      function goNext() { dismissHint(); active = (active + 1) % total; layout(); }
+      function goPrev() { dismissHint(); active = (active - 1 + total) % total; layout(); }
+      function goTo(i)  { dismissHint(); active = ((i % total) + total) % total; layout(); }
 
       // Apply transform during drag (used while phase === 'dragging')
       function applyDragTransform() {
@@ -3240,8 +3301,11 @@
         lastT = e.timeStamp || performance.now();
         dragX = 0;
         velocity = 0;
-        // Strip any first-load hint so user-driven motion takes over
+        // Strip any first-load hint animation on the card itself
         topCard.classList.remove('hint');
+        // Drop the "Swipe to see" caption — the user has clearly
+        // understood the deck is interactive.
+        dismissHint();
       }
 
       function onPointerMove(e) {
