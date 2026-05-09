@@ -1814,7 +1814,7 @@
         linear-gradient(135deg, #000000 0%, #050402 50%, #110C05 100%);
       pointer-events: auto;
       will-change: opacity;
-      animation: introOverlayOut 520ms cubic-bezier(0.4, 0, 0.6, 1) 1900ms forwards;
+      animation: introOverlayOut 520ms cubic-bezier(0.4, 0, 0.6, 1) 2050ms forwards;
     }
     /* JS toggles .intro-overlay.done to fully remove it from layout
        once the animation has completed (so it can never block
@@ -1823,20 +1823,28 @@
       display: none;
     }
 
+    /* Lockup: A on the left, wordmark track on the right.
+       z-index ordering means the wordmark is physically behind the
+       mark during the slide — when its track is 0-width, it's
+       entirely hidden under/behind the A's right edge. */
     .intro-lockup {
       display: inline-flex;
       align-items: center;
-      gap: clamp(0.85rem, 2vw, 1.5rem);
       padding: 1rem;
+      isolation: isolate;
     }
 
-    /* The A mark — fades + scales in first */
+    /* The A mark — fades + scales in first. Sits on top of the
+       wordmark via z-index so the wordmark visibly emerges from
+       behind it during the slide. */
     .intro-mark {
       display: block;
       width: clamp(64px, 11vw, 120px);
       height: clamp(64px, 11vw, 120px);
       object-fit: contain;
       flex-shrink: 0;
+      position: relative;
+      z-index: 2;
       opacity: 0;
       transform: scale(0.6);
       will-change: opacity, transform;
@@ -1846,35 +1854,43 @@
       to { opacity: 1; transform: scale(1); }
     }
 
-    /* The wordmark slides out from behind the mark — clip-path
-       reveals it left-to-right while a slight translateX adds the
-       "emerging" feel. The track wrapper exists so we can position-
-       relative anchor it next to the mark in the lockup grid. */
+    /* The wordmark track is an inline-grid cell that grows from
+       0fr → 1fr — animating its column width from zero to whatever
+       the wordmark naturally needs. overflow:hidden on the track
+       clips the wordmark when the track is narrower than content.
+       Combined with the wordmark's own translateX(-100% → 0), the
+       wordmark slides into the growing space from the left edge —
+       which is the A's right edge — i.e. literally from behind it. */
     .intro-wordmark-track {
-      display: inline-block;
+      display: inline-grid;
+      grid-template-columns: 0fr;
+      overflow: hidden;
       position: relative;
-      overflow: visible;
+      z-index: 1;
+      animation: introTrackOpen 1100ms cubic-bezier(0.2, 0.8, 0.2, 1) 620ms forwards;
+    }
+    @keyframes introTrackOpen {
+      to { grid-template-columns: 1fr; }
     }
     .intro-wordmark {
       display: inline-block;
+      min-width: 0;
+      white-space: nowrap;
       font-family: var(--font-display);
       font-size: clamp(1.4rem, 4.6vw, 2.75rem);
       font-weight: 700;
       letter-spacing: -0.02em;
       line-height: 1;
-      color: var(--ink);
-      white-space: nowrap;
-      /* Start fully hidden behind the mark — clip from the right */
-      clip-path: inset(-15% 100% -15% 0);
-      transform: translateX(-18px);
-      will-change: clip-path, transform;
-      animation: introWordmarkIn 950ms cubic-bezier(0.2, 0.8, 0.2, 1) 620ms forwards;
+      color: var(--gold);
+      /* padding-left provides the final gap between A and wordmark
+         once the track has fully opened. */
+      padding-left: clamp(0.85rem, 2vw, 1.5rem);
+      transform: translateX(-100%);
+      will-change: transform;
+      animation: introWordmarkSlide 1100ms cubic-bezier(0.2, 0.8, 0.2, 1) 620ms forwards;
     }
-    @keyframes introWordmarkIn {
-      to {
-        clip-path: inset(-15% 0% -15% 0);
-        transform: translateX(0);
-      }
+    @keyframes introWordmarkSlide {
+      to { transform: translateX(0); }
     }
 
     @keyframes introOverlayOut {
@@ -1928,10 +1944,10 @@
        ========================================================= -->
   <div class="intro-overlay" id="introOverlay" role="presentation" aria-hidden="true">
     <div class="intro-lockup">
-      <img class="intro-mark" src="logo/algo-mark-a.png" alt="" aria-hidden="true" width="120" height="120">
-      <span class="intro-wordmark-track" aria-hidden="true">
+      <img class="intro-mark" src="logo/algo-mark-a-transparent.png" alt="" aria-hidden="true" width="120" height="120">
+      <div class="intro-wordmark-track" aria-hidden="true">
         <span class="intro-wordmark">Algo by Excelsior</span>
-      </span>
+      </div>
     </div>
   </div>
 
@@ -2651,9 +2667,9 @@
       }
 
       // Timed dismiss after the CSS animation is done. The CSS
-      // overlay fade-out kicks off at 1900ms and lasts ~520ms, so
-      // we tear it down at 2450ms to be safe.
-      setTimeout(dismiss, 2450);
+      // overlay fade-out kicks off at 2050ms and lasts ~520ms, so
+      // we tear it down at 2600ms to be safe.
+      setTimeout(dismiss, 2600);
 
       // Skip on click and on Escape
       overlay.addEventListener('click', dismiss);
